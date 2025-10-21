@@ -68,82 +68,262 @@
 }
 
 .darkmode-container input:checked+label {
-  background: #242424;
+  background: #3c3836;
 }
 
 .darkmode-container input:checked+label:after {
   left: 98px;
   transform: translateX(-100%);
-  background: linear-gradient(180deg, #777, #3a3a3a);
+  background: linear-gradient(180deg, #d79921, #b57614);
 }
 
 .darkmode-container input:checked+label svg.sun {
-  fill: #7e7e7e;
+  fill: #665c54;
 }
 
 .darkmode-container input:checked+label svg.moon {
-  fill: #fff;
+  fill: #fbf1c7;
 }
 
-/* Dark Mode Styles */
-body.dark-mode {
-  background: #242424;
-  color: #ffffff;
+/* Gruvbox Dark Mode Colors */
+:root {
+  --gruvbox-bg0-hard: #1d2021;
+  --gruvbox-bg0: #282828;
+  --gruvbox-bg1: #3c3836;
+  --gruvbox-bg2: #504945;
+  --gruvbox-bg3: #665c54;
+  --gruvbox-bg4: #7c6f64;
+
+  --gruvbox-fg0: #fbf1c7;
+  --gruvbox-fg1: #ebdbb2;
+  --gruvbox-fg2: #d5c4a1;
+  --gruvbox-fg3: #bdae93;
+  --gruvbox-fg4: #a89984;
+
+  --gruvbox-red: #fb4934;
+  --gruvbox-green: #b8bb26;
+  --gruvbox-yellow: #fabd2f;
+  --gruvbox-blue: #83a598;
+  --gruvbox-purple: #d3869b;
+  --gruvbox-aqua: #8ec07c;
+  --gruvbox-orange: #fe8019;
 }
 
-body.dark-mode .layout {
-  background: #242424;
+/* Dark Mode Styles - Gruvbox Theme */
+.dark-mode {
+  background: var(--gruvbox-bg0-hard);
+  color: var(--gruvbox-fg1);
 }
 
-body.dark-mode header {
-  background: #1a1a1a !important;
+.dark-mode .layout {
+  background: var(--gruvbox-bg0-hard);
+}
+
+.dark-mode header {
+  background: var(--gruvbox-bg0) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid var(--gruvbox-bg2);
 }
 
-body.dark-mode header a,
-body.dark-mode header button {
-  color: #e0e0e0 !important;
+.dark-mode header a,
+.dark-mode header button {
+  color: var(--gruvbox-fg1) !important;
 }
 
-body.dark-mode header a:hover {
-  color: #60a5fa !important;
+.dark-mode header a:hover {
+  color: var(--gruvbox-blue) !important;
 }
 
-body.dark-mode header .text-gray-700 {
-  color: #e0e0e0 !important;
+.dark-mode header .text-gray-700 {
+  color: var(--gruvbox-fg1) !important;
 }
 
-body.dark-mode footer {
-  background: #1a1a1a !important;
+.dark-mode header .text-blue-600 {
+  color: var(--gruvbox-yellow) !important;
 }
 
-body.dark-mode .bg-white {
-  background: #1f1f1f !important;
+.dark-mode header .bg-blue-50 {
+  background: var(--gruvbox-bg2) !important;
 }
 
-body.dark-mode .text-gray-700,
-body.dark-mode .text-gray-600,
-body.dark-mode .text-gray-900 {
-  color: #e0e0e0 !important;
+.dark-mode header .hover\:bg-gray-100:hover {
+  background: var(--gruvbox-bg2) !important;
 }
 
-body.dark-mode .text-gray-400 {
-  color: #9ca3af !important;
+.dark-mode header .bg-blue-500 {
+  background: var(--gruvbox-orange) !important;
 }
 
-body.dark-mode .border-gray-300 {
-  border-color: #374151 !important;
+.dark-mode header .bg-blue-600 {
+  background: var(--gruvbox-blue) !important;
 }
 
-body.dark-mode input,
-body.dark-mode textarea {
-  background: #2d2d2d !important;
-  color: #e0e0e0 !important;
-  border-color: #374151 !important;
+.dark-mode header .hover\:bg-blue-700:hover {
+  background: var(--gruvbox-aqua) !important;
 }
 
-body.dark-mode .shadow-md,
-body.dark-mode .shadow-lg,
-body.dark-mode .shadow-xl {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+.dark-mode footer {
+  background: var(--gruvbox-bg0) !important;
+  border-top: 1px solid var(--gruvbox-bg2);
+}
+
+.dark-mode footer .bg-gray-800 {
+  background: var(--gruvbox-bg0) !important;
+}
+
+.dark-mode footer .text-white {
+  color: var(--gruvbox-fg1) !important;
+}
+
+.dark-mode footer .text-gray-400 {
+  color: var(--gruvbox-fg3) !important;
+}
+
+.dark-mode footer .hover\:text-white:hover {
+  color: var(--gruvbox-yellow) !important;
+}
+
+.dark-mode footer .border-gray-700 {
+  border-color: var(--gruvbox-bg2) !important;
+}
+
+.dark-mode .bg-white {
+  background: var(--gruvbox-bg1) !important;
+}
+
+.dark-mode .text-gray-700,
+.dark-mode .text-gray-600,
+.dark-mode .text-gray-900 {
+  color: var(--gruvbox-fg1) !important;
+}
+
+.dark-mode .text-gray-400,
+.dark-mode .text-gray-500 {
+  color: var(--gruvbox-fg3) !important;
+}
+
+.dark-mode .border-gray-300 {
+  border-color: var(--gruvbox-bg3) !important;
+}
+
+.dark-mode input,
+.dark-mode textarea {
+  background: var(--gruvbox-bg2) !important;
+  color: var(--gruvbox-fg1) !important;
+  border-color: var(--gruvbox-bg3) !important;
+}
+
+.dark-mode input:focus,
+.dark-mode textarea:focus {
+  border-color: var(--gruvbox-blue) !important;
+  ring-color: var(--gruvbox-blue) !important;
+}
+
+.dark-mode .shadow-md,
+.dark-mode .shadow-lg,
+.dark-mode .shadow-xl {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Login & Register Pages - Gruvbox Dark */
+.dark-mode .bg-gradient-to-br {
+  background: var(--gruvbox-bg0-hard) !important;
+}
+
+.dark-mode .rounded-2xl {
+  background: var(--gruvbox-bg1) !important;
+}
+
+.dark-mode .text-blue-600 {
+  color: var(--gruvbox-yellow) !important;
+}
+
+.dark-mode .hover\:text-blue-700:hover {
+  color: var(--gruvbox-orange) !important;
+}
+
+.dark-mode .bg-blue-600 {
+  background: var(--gruvbox-blue) !important;
+}
+
+.dark-mode .hover\:bg-blue-700:hover {
+  background: var(--gruvbox-aqua) !important;
+}
+
+.dark-mode .bg-purple-600 {
+  background: var(--gruvbox-purple) !important;
+}
+
+.dark-mode .hover\:bg-purple-700:hover {
+  background: var(--gruvbox-red) !important;
+}
+
+.dark-mode .text-purple-600 {
+  color: var(--gruvbox-purple) !important;
+}
+
+.dark-mode .hover\:text-purple-700:hover {
+  color: var(--gruvbox-red) !important;
+}
+
+.dark-mode .text-red-600 {
+  color: var(--gruvbox-red) !important;
+}
+
+.dark-mode .text-green-600 {
+  color: var(--gruvbox-green) !important;
+}
+
+.dark-mode .bg-black {
+  background: var(--gruvbox-bg0-hard) !important;
+}
+
+.dark-mode .hover\:bg-gray-800:hover {
+  background: var(--gruvbox-bg1) !important;
+}
+
+.dark-mode .hover\:bg-gray-50:hover {
+  background: var(--gruvbox-bg2) !important;
+}
+
+.dark-mode .hover\:bg-gray-100:hover {
+  background: var(--gruvbox-bg2) !important;
+}
+
+.dark-mode .bg-red-500 {
+  background: var(--gruvbox-red) !important;
+}
+
+.dark-mode .bg-orange-500 {
+  background: var(--gruvbox-orange) !important;
+}
+
+.dark-mode .bg-yellow-500 {
+  background: var(--gruvbox-yellow) !important;
+}
+
+.dark-mode .bg-green-500 {
+  background: var(--gruvbox-green) !important;
+}
+
+/* Dropdown Menu */
+.dark-mode .ring-black {
+  ring-color: var(--gruvbox-bg3) !important;
+}
+
+/* Social Login Buttons */
+.dark-mode .bg-\[\#1877F2\] {
+  background: #458588 !important;
+}
+
+.dark-mode .hover\:bg-\[\#166FE5\]:hover {
+  background: #83a598 !important;
+}
+
+.dark-mode .bg-\[\#00B900\] {
+  background: #98971a !important;
+}
+
+.dark-mode .hover\:bg-\[\#00A000\]:hover {
+  background: #b8bb26 !important;
 }
