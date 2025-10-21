@@ -26,7 +26,6 @@ Your app is ready to be deployed!
 ## Feature
 - gruv dark mode toggle
 - solid router
-
 ## Deployment
 
 Learn more about deploying your application with the [documentations](https://vite.dev/guide/static-deploy.html)
