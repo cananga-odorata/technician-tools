@@ -1,6 +1,7 @@
 import { A } from "@solidjs/router";
 import { createSignal } from "solid-js";
 import DarkModeToggle from "../DarkModeToggle";
+import connectusIcon from '/public/connectedSocial-icon-notextbg.png';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = createSignal(false);
@@ -15,7 +16,7 @@ export default function Header() {
                         {/* Logo */}
                         <div class="flex-shrink-0">
                             <A href="/" class="text-2xl font-bold text-blue-600 hover:text-blue-700">
-                                Logo
+                                <img src={connectusIcon} alt='connectus' class='w-12 h-12 inline-block mr-2' />
                             </A>
                         </div>
 
