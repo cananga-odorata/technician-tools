@@ -7,38 +7,63 @@ declare const google: any;
 type UserCredential = string;
 
 export default function GoogleLogin() {
-
     const [user, setUser] = createSignal<UserCredential | null>(null);
+    const [isLoading, setIsLoading] = createSignal(false);
+    const [error, setError] = createSignal<string | null>(null);
 
     /**
      * 2. ฟังก์ชัน Callback ที่จะถูกเรียกโดย Google
      */
-    function handleLoginCallback(response: any) {
-        console.log("Login Success! Response:", response);
-        const jwtToken = response.credential;
-        console.log("This is your ID Token (JWT):", jwtToken);
+    async function handleLoginCallback(response: any) {
+        setIsLoading(true);
+        setError(null);
 
-        // --- (เพิ่มส่วนนี้) วิธีถอดรหัส Token บน Client ---
         try {
-            // 1. Token มี 3 ส่วน (Header, Payload, Signature) เราต้องการส่วน Payload (ตรงกลาง)
-            const payloadBase64 = jwtToken.split('.')[1];
+            console.log("Login Success! Response:", response);
+            const jwtToken = response.credential;
+            console.log("This is your ID Token (JWT):", jwtToken);
 
-            // 2. จัดการตัวอักษรพิเศษสำหรับ Base64
-            const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+            // --- (เพิ่มส่วนนี้) วิธีถอดรหัส Token บน Client ---
+            try {
+                // 1. Token มี 3 ส่วน (Header, Payload, Signature) เราต้องการส่วน Payload (ตรงกลาง)
+                const payloadBase64 = jwtToken.split('.')[1];
 
-            // 3. ถอดรหัส Base64 เป็น JSON String
-            const decodedJson = atob(base64);
+                // 2. จัดการตัวอักษรพิเศษสำหรับ Base64
+                const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
 
-            // 4. แปลง JSON String เป็น Object
-            const payload = JSON.parse(decodedJson);
-            localStorage.setItem('user_profile', JSON.stringify(payload));
+                // 3. ถอดรหัส Base64 เป็น JSON String
+                const decodedJson = atob(base64);
 
-            // console.log("--- User Data (Decoded on Client) ---");
-            // console.log("Email:", payload.email);
-            // console.log("Name:", payload.name);
-            // console.log("Picture URL:", payload.picture);
-            // console.log("Google User ID:", payload.sub);
-            // console.log("--------------------------------------");
+                // 4. แปลง JSON String เป็น Object
+                const payload = JSON.parse(decodedJson);
+
+                // Add additional user data
+                const enrichedPayload = {
+                    ...payload,
+                    loginMethod: 'google',
+                    timestamp: new Date().toISOString()
+                };
+
+                // Simulate API call to your backend (if needed)
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Save to localStorage
+                localStorage.setItem('user_profile', JSON.stringify(enrichedPayload));
+
+                // Set user state (this will show success message briefly before redirect)
+                setUser(enrichedPayload);
+
+                // Small delay before redirect for better UX
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 500);
+
+            } catch (err) {
+                console.error('Login error:', err);
+                setError(err instanceof Error ? err.message : "Google login failed. Please try again.");
+            } finally {
+                setIsLoading(false);
+            }
 
             // คุณสามารถนำข้อมูลนี้ไปใส่ใน Signal (State) ของคุณได้เลย
             // setUserProfile(payload); // (ถ้าคุณมี Signal นี้)
@@ -87,10 +112,32 @@ export default function GoogleLogin() {
             <Show
                 when={user()}
                 fallback={
-                    // นี่คือ div ที่ Google จะใช้สร้างปุ่ม
-                    // เราจัดให้อยู่ตรงกลางเพื่อให้ปุ่มที่ Google สร้างมาอยู่ตรงกลาง
-                    <div class="flex justify-center">
-                        <div id="google-login-button-div"></div>
+                    <div class="space-y-3">
+                        <Show when={error()}>
+                            <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                                {error()}
+                            </div>
+                        </Show>
+
+                        <div class="relative">
+                            {/* Loading Overlay */}
+                            <Show when={isLoading()}>
+                                <div class="absolute inset-0 bg-white/80 flex items-center justify-center rounded-lg z-10">
+                                    <div class="flex items-center space-x-2">
+                                        <svg class="animate-spin h-5 w-5 text-blue-600" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                        </svg>
+                                        <span class="text-sm text-gray-600">Connecting to Google...</span>
+                                    </div>
+                                </div>
+                            </Show>
+
+                            {/* Google Button Container */}
+                            <div class="flex justify-center">
+                                <div id="google-login-button-div"></div>
+                            </div>
+                        </div>
                     </div>
                 }
             >

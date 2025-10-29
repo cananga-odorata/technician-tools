@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { A } from "@solidjs/router";
 import GoogleLogin from "./google/GoogleLogin";
 
@@ -6,11 +6,58 @@ export default function Login() {
     const [email, setEmail] = createSignal("");
     const [password, setPassword] = createSignal("");
     const [showPassword, setShowPassword] = createSignal(false);
+    const [isLoading, setIsLoading] = createSignal(false);
+    const [error, setError] = createSignal<string | null>(null);
 
-    const handleSubmit = (e: Event) => {
+    const validateForm = () => {
+        if (!email()) {
+            setError("Email is required");
+            return false;
+        }
+        if (!email().includes('@')) {
+            setError("Invalid email format");
+            return false;
+        }
+        if (!password()) {
+            setError("Password is required");
+            return false;
+        }
+        if (password().length < 6) {
+            setError("Password must be at least 6 characters");
+            return false;
+        }
+        return true;
+    };
+
+    const handleSubmit = async (e: Event) => {
         e.preventDefault();
-        console.log("Login with:", email(), password());
-        // Add your login logic here
+        setError(null);
+
+        // Validation
+        if (!validateForm()) return;
+
+        try {
+            setIsLoading(true);
+
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // After successful login validation:
+            // 1. Save user data
+            localStorage.setItem('user_profile', JSON.stringify({
+                email: email(),
+                name: email().split('@')[0],
+                loginMethod: 'email',
+                timestamp: new Date().toISOString()
+            }));
+
+            // 2. Redirect to home page
+            window.location.href = '/';
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Login failed. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleSocialLogin = (provider: string) => {
@@ -156,12 +203,33 @@ export default function Login() {
                             </a>
                         </div>
 
+                        {/* Error Message */}
+                        <Show when={error()}>
+                            <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                                {error()}
+                            </div>
+                        </Show>
+
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition focus:ring-4 focus:ring-blue-200"
+                            disabled={isLoading()}
+                            class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed relative"
                         >
-                            Sign In
+                            <Show
+                                when={!isLoading()}
+                                fallback={
+                                    <div class="flex items-center justify-center">
+                                        <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                        </svg>
+                                        Signing in...
+                                    </div>
+                                }
+                            >
+                                Sign In
+                            </Show>
                         </button>
                     </form>
 
