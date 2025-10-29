@@ -10,7 +10,7 @@
 /* Dark Mode Toggle Styles */
 .darkmode-container {
   position: fixed;
-  top: 80px;
+  bottom: 20px;
   right: 20px;
   z-index: 1000;
 }
@@ -103,7 +103,7 @@
   --gruvbox-red: #fb4934;
   --gruvbox-green: #b8bb26;
   --gruvbox-yellow: #fabd2f;
-  --gruvbox-blue: #83a598;
+  --gruvbox-blue: #010101;
   --gruvbox-purple: #d3869b;
   --gruvbox-aqua: #8ec07c;
   --gruvbox-orange: #fe8019;
@@ -139,11 +139,11 @@
 }
 
 .dark-mode header .text-blue-600 {
-  color: var(--gruvbox-yellow) !important;
+  color: var(--theme-text-primary) !important;
 }
 
 .dark-mode header .bg-blue-50 {
-  background: var(--gruvbox-bg2) !important;
+  background: var(--theme-bg-tertiary) !important;
 }
 
 .dark-mode header .hover\:bg-gray-100:hover {
@@ -326,4 +326,302 @@
 
 .dark-mode .hover\:bg-\[\#00A000\]:hover {
   background: #b8bb26 !important;
+}
+
+/* ====================================
+   THEME SYSTEM 
+   ==================================== */
+
+/* Gruvbox Theme */
+.theme-gruvbox {
+  --theme-bg-primary: #282828;
+  --theme-bg-secondary: #3c3836;
+  --theme-bg-tertiary: #504945;
+  --theme-text-primary: #ebdbb2;
+  --theme-text-secondary: #d5c4a1;
+  --theme-accent-primary: #d79921;
+  --theme-accent-secondary: #83a598;
+  --theme-accent-tertiary: #b8bb26;
+}
+
+/* Dracula Theme */
+.theme-dracula {
+  --theme-bg-primary: #282a36;
+  --theme-bg-secondary: #44475a;
+  --theme-bg-tertiary: #6272a4;
+  --theme-text-primary: #f8f8f2;
+  --theme-text-secondary: #e6e6e6;
+  --theme-accent-primary: #bd93f9;
+  --theme-accent-secondary: #50fa7b;
+  --theme-accent-tertiary: #ff79c6;
+}
+
+/* Nord Theme */
+.theme-nord {
+  --theme-bg-primary: #2e3440;
+  --theme-bg-secondary: #3b4252;
+  --theme-bg-tertiary: #434c5e;
+  --theme-text-primary: #eceff4;
+  --theme-text-secondary: #d8dee9;
+  --theme-accent-primary: #88c0d0;
+  --theme-accent-secondary: #81a1c1;
+  --theme-accent-tertiary: #5e81ac;
+}
+
+/* Tokyo Night Theme */
+.theme-tokyo-night {
+  --theme-bg-primary: #1a1b26;
+  --theme-bg-secondary: #24283b;
+  --theme-bg-tertiary: #414868;
+  --theme-text-primary: #c0caf5;
+  --theme-text-secondary: #a9b1d6;
+  --theme-accent-primary: #7aa2f7;
+  --theme-accent-secondary: #bb9af7;
+  --theme-accent-tertiary: #9ece6a;
+}
+
+/* Catppuccin Theme */
+.theme-catppuccin {
+  --theme-bg-primary: #1e1e2e;
+  --theme-bg-secondary: #313244;
+  --theme-bg-tertiary: #45475a;
+  --theme-text-primary: #cdd6f4;
+  --theme-text-secondary: #bac2de;
+  --theme-accent-primary: #cba6f7;
+  --theme-accent-secondary: #89b4fa;
+  --theme-accent-tertiary: #f5c2e7;
+}
+
+/* Light Theme */
+.theme-light {
+  --theme-bg-primary: #ffffff;
+  --theme-bg-secondary: #f3f4f6;
+  --theme-bg-tertiary: #e5e7eb;
+  --theme-text-primary: #1f2937;
+  --theme-text-secondary: #4b5563;
+  --theme-accent-primary: #3b82f6;
+  --theme-accent-secondary: #8b5cf6;
+  --theme-accent-tertiary: #10b981;
+}
+
+/* Duminda Perera */
+.theme-duminda {
+  --theme-bg-primary: #121212;
+  --theme-bg-secondary: #1e1e1e;
+  --theme-bg-tertiary: #2c2c2c;
+  --theme-text-primary: #e0e0e0;
+  --theme-text-secondary: #b3b3b3;
+  --theme-accent-primary: #ff6ac1;
+  --theme-accent-secondary: #6a5acd;
+  --theme-accent-tertiary: #20c997;
+}
+
+.theme-earthy-forest-hues {
+  --theme-bg-primary: #2b3a2e;
+  --theme-bg-secondary: #3c4f3c;
+  --theme-bg-tertiary: #5a6d5a;
+  --theme-text-primary: #e6e1d2;
+  --theme-text-secondary: #b8b5a4;
+  --theme-accent-primary: #a3b18a;
+  --theme-accent-secondary: #6a994e;
+  --theme-accent-tertiary: #f2cc8f;
+
+}
+
+.theme-autumn-glow {
+  --theme-bg-primary: #3e2f2f;
+  --theme-bg-secondary: #5c4033;
+  --theme-bg-tertiary: #7d5a4f;
+  --theme-text-primary: #f0e6d2;
+  --theme-text-secondary: #c4b9a6;
+  --theme-accent-primary: #d97706;
+  --theme-accent-secondary: #b45309;
+  --theme-accent-tertiary: #ea580c;
+}
+
+.theme-black-and-gold-elegance {
+  --theme-bg-primary: #1c1c1c;
+  --theme-bg-secondary: #2e2e2e;
+  --theme-bg-tertiary: #444444;
+  --theme-text-primary: #dcdff5;
+  --theme-text-secondary: #d4cfa3;
+  --theme-accent-primary: #ffd700;
+  --theme-accent-secondary: #daa520;
+  --theme-accent-tertiary: #b8860b;
+}
+
+.theme-cyberpunk {
+  --theme-bg-primary: #0f0f1a;
+  --theme-bg-secondary: #1a1a2e;
+  --theme-bg-tertiary: #2e2e4e;
+  --theme-text-primary: #e0e0ff;
+  --theme-text-secondary: #b3b3d1;
+  --theme-accent-primary: #ff00ff;
+  --theme-accent-secondary: #00ffff;
+  --theme-accent-tertiary: #ff9900;
+}
+
+.theme-arctic-frost {
+  --theme-bg-primary: #e6f0f5;
+  --theme-bg-secondary: #cfdde6;
+  --theme-bg-tertiary: #b7c9d9;
+  --theme-text-primary: #1e2a32;
+  --theme-text-secondary: #3b4a59;
+  --theme-accent-primary: #5dade2;
+  --theme-accent-secondary: #85c1e9;
+  --theme-accent-tertiary: #aed6f1;
+}
+
+
+/* ====================================
+   APPLY THEMES TO ELEMENTS
+   ==================================== */
+
+/* *** FIX ***
+   We are applying styles to <html> (document.documentElement) 
+   instead of <body>
+*/
+
+/* Background Colors */
+html.dark-mode {
+  background: var(--theme-bg-primary) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+.dark-mode header {
+  background: var(--theme-bg-secondary) !important;
+  border-bottom: 1px solid var(--theme-bg-tertiary);
+}
+
+.dark-mode footer {
+  background: var(--theme-bg-secondary) !important;
+  border-top: 1px solid var(--theme-bg-tertiary);
+}
+
+/* Text Colors */
+.dark-mode .text-gray-700,
+.dark-mode .text-gray-600,
+.dark-mode .text-gray-900 {
+  color: var(--theme-text-primary) !important;
+}
+
+.dark-mode .text-gray-400,
+.dark-mode .text-gray-500 {
+  color: var(--theme-text-secondary) !important;
+}
+
+/* Accent Colors */
+.dark-mode .text-blue-600,
+.dark-mode .hover\:text-blue-600:hover {
+  color: var(--theme-accent-primary) !important;
+}
+
+.dark-mode .bg-blue-600 {
+  background: var(--theme-accent-primary) !important;
+}
+
+.dark-mode .hover\:bg-blue-700:hover {
+  background: var(--theme-accent-secondary) !important;
+}
+
+.dark-mode .bg-blue-50 {
+  background: var(--theme-bg-tertiary) !important;
+}
+
+/* Cards & Components */
+.dark-mode .bg-white {
+  background: var(--theme-bg-secondary) !important;
+}
+
+.dark-mode .rounded-2xl,
+.dark-mode .rounded-lg {
+  background: var(--theme-bg-secondary) !important;
+}
+
+.dark-mode .border-gray-300,
+.dark-mode .border-gray-200 {
+  border-color: var(--theme-bg-tertiary) !important;
+}
+
+/* Hover Effects */
+.dark-mode .hover\:bg-gray-100:hover,
+.dark-mode .hover\:bg-gray-50:hover {
+  background: var(--theme-bg-tertiary) !important;
+}
+
+/* Input Fields */
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select {
+  background: var(--theme-bg-tertiary) !important;
+  color: var(--theme-text-primary) !important;
+  border-color: var(--theme-bg-tertiary) !important;
+}
+
+.dark-mode input:focus,
+.dark-mode textarea:focus,
+.dark-mode select:focus {
+  border-color: var(--theme-accent-primary) !important;
+  outline-color: var(--theme-accent-primary) !important;
+}
+
+/* Shadows */
+.dark-mode .shadow-md,
+.dark-mode .shadow-lg,
+.dark-mode .shadow-xl {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Navigation */
+.dark-mode header a,
+.dark-mode header button {
+  color: var(--theme-text-primary) !important;
+}
+
+.dark-mode header a:hover {
+  color: var(--theme-accent-primary) !important;
+}
+
+/* Buttons */
+.dark-mode .bg-red-500 {
+  background: #fb4934 !important;
+}
+
+.dark-mode .bg-green-500 {
+  background: var(--theme-accent-tertiary) !important;
+}
+
+.dark-mode .bg-purple-600 {
+  background: var(--theme-accent-secondary) !important;
+}
+
+/* Dropdown Menu */
+.dark-mode .ring-black {
+  --tw-ring-color: var(--theme-bg-tertiary) !important;
+}
+
+/* Settings Page Specific */
+.dark-mode .bg-gray-50 {
+  background: var(--theme-bg-primary) !important;
+}
+
+/* ====================================
+   LIGHT MODE OVERRIDES
+   ==================================== */
+
+/* *** FIX ***
+   Targeting <html> instead of <body>
+   and removing :not(.dark-mode) as JS handles this logic.
+*/
+html.theme-light {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+}
+
+.theme-light header {
+  background: #ffffff !important;
+}
+
+.theme-light .text-gray-700 {
+  color: #374151 !important;
 }
