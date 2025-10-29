@@ -8,6 +8,18 @@ export default function Header() {
     const [isProfileOpen, setIsProfileOpen] = createSignal(false);
     const [userProfile, setUserProfile] = createSignal<string | null>(null);
 
+    const handleLogout = (e: Event) => {
+        e.preventDefault();
+        localStorage.removeItem('user_profile');
+        // Clear any other auth-related items
+        localStorage.clear();
+        // Reset state
+        setUserProfile(null);
+        setIsProfileOpen(false);
+        // Redirect to login page
+        window.location.href = '/login';
+    };
+
     onMount(() => {
         const userProfile = localStorage.getItem('user_profile');
         if (userProfile) {
@@ -115,7 +127,9 @@ export default function Header() {
                                                     Settings
                                                 </a>
                                                 <hr class="my-1" />
-                                                <a href="/logout" class="block px-4 py-2 text-sm text-blue-600 hover:bg-gray-100">
+                                                <a href="#"
+                                                    onClick={handleLogout}
+                                                    class="block px-4 py-2 text-sm text-blue-600 hover:bg-gray-100">
                                                     Logout
                                                 </a>
                                             </div>
