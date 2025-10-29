@@ -1,11 +1,24 @@
 import { A } from "@solidjs/router";
-import { createSignal } from "solid-js";
-import DarkModeToggle from "../DarkModeToggle";
+import { createSignal, onMount } from "solid-js";
+// import DarkModeToggle from "../DarkModeToggle";
 import connectusIcon from '/public/connectedSocial-icon-notextbg.png';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = createSignal(false);
     const [isProfileOpen, setIsProfileOpen] = createSignal(false);
+    const [userProfile, setUserProfile] = createSignal<string | null>(null);
+
+    onMount(() => {
+        const userProfile = localStorage.getItem('user_profile');
+        if (userProfile) {
+            setUserProfile(userProfile);
+            // console.log("User Profile from localStorage:", JSON.parse(userProfile));
+            // console.log("User Profile from localStorage:", JSON.parse(userProfile).picture);
+
+        } else {
+            console.log("User Profile not found in localStorage.");
+        }
+    });
 
     return (
         <>
@@ -25,21 +38,21 @@ export default function Header() {
                             <A
                                 href="/"
                                 end
-                                class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition"
+                                class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition"
                                 activeClass="text-blue-600 bg-blue-50"
                             >
                                 Home
                             </A>
                             <A
                                 href="/about"
-                                class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition"
+                                class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition"
                                 activeClass="text-blue-600 bg-blue-50"
                             >
                                 About
                             </A>
                             <A
                                 href="/contact"
-                                class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition"
+                                class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition"
                                 activeClass="text-blue-600 bg-blue-50"
                             >
                                 Contact
@@ -63,46 +76,66 @@ export default function Header() {
                                 <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                             </button>
 
-                            {/* Profile Dropdown */}
-                            <div class="relative">
-                                <button
-                                    onClick={() => setIsProfileOpen(!isProfileOpen())}
-                                    class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none"
-                                >
-                                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
 
-                                {/* Dropdown Menu */}
-                                {isProfileOpen() && (
-                                    <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
-                                        <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            Profile
-                                        </a>
-                                        <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            Settings
-                                        </a>
-                                        <hr class="my-1" />
-                                        <a href="/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                                            Logout
-                                        </a>
-                                    </div>
-                                )}
-                            </div>
+                            {userProfile() ? (
+                                <>
+                                    {/* Profile Dropdown */}
+                                    <div class="relative">
+                                        <button
+                                            onClick={() => setIsProfileOpen(!isProfileOpen())}
+                                            class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none"
+                                        >
 
-                            {/* Login Button */}
-                            <A
-                                href="/login"
-                                class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition"
-                            >
-                                Login
-                            </A>
+                                            {userProfile() ? (
+
+                                                <img src={JSON.parse(userProfile()!).picture} alt="Profile" class="w-8 h-8 rounded-full" />
+                                            ) :
+                                                (
+                                                    <>
+                                                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </>
+
+                                                )}
+                                        </button>
+
+                                        {/* Dropdown Menu */}
+                                        {isProfileOpen() && (
+                                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
+                                                <a href="/profile" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">
+                                                    Profile
+                                                </a>
+                                                <a href="/settings" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">
+                                                    Settings
+                                                </a>
+                                                <hr class="my-1" />
+                                                <a href="/logout" class="block px-4 py-2 text-sm text-blue-600 hover:bg-gray-100">
+                                                    Logout
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+
+                                    {/* Login Button */}
+                                    <A
+                                        href="/login"
+                                        class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition"
+                                    >
+                                        Login
+                                    </A>
+                                </>
+                            )}
+
+
                         </div>
 
                         {/* Mobile menu button */}
@@ -122,9 +155,9 @@ export default function Header() {
                         </div>
                     </div>
 
-                    <div class="">
+                    {/* <div class="">
                         <DarkModeToggle />
-                    </div>
+                    </div> */}
                     {/* Mobile Navigation */}
                     {isMenuOpen() && (
                         <div class="md:hidden pb-4">

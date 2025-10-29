@@ -5,22 +5,55 @@ export default function DarkModeToggle() {
 
     onMount(() => {
         const saved = localStorage.getItem('darkMode');
+        const savedTheme = localStorage.getItem('theme') || 'gruvbox';
+
         if (saved) {
             const darkMode = saved === 'true';
             setIsDark(darkMode);
-            if (darkMode) {
-                document.body.classList.add('dark-mode');
-            }
+            applyTheme(savedTheme, darkMode);
+        } else {
+            applyTheme(savedTheme, false);
         }
     });
 
+    const applyTheme = (themeId: string, isDarkMode: boolean) => {
+        // Remove all theme classes
+        document.body.classList.remove(
+            'theme-gruvbox',
+            'theme-dracula',
+            'theme-nord',
+            'theme-tokyo-night',
+            'theme-catppuccin',
+            'theme-light',
+            'theme-duminda',
+            'theme-earthy-forest-hues',
+            'theme-autumn-glow',
+            'theme-black-and-gold-elegance',
+            'theme-cyberpunk',
+            'theme-arctic-frost',
+        );
+
+        // Add selected theme class
+        document.body.classList.add(`theme-${themeId}`);
+
+        // Apply dark mode
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+    };
+
     const toggleDarkMode = () => {
         const newValue = !isDark();
+        const savedTheme = localStorage.getItem('theme') || 'gruvbox';
+
         setIsDark(newValue);
         localStorage.setItem('darkMode', String(newValue));
 
-        newValue ? document.body.classList.add('dark-mode') : document.body.classList.remove('dark-mode');
+        applyTheme(savedTheme, newValue);
     }
+
     return (
         <div class="darkmode-container">
             <input
