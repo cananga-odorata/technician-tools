@@ -6,8 +6,8 @@ const LanguageSelector: Component = () => {
     let containerRef: HTMLDivElement | undefined;
 
     const languages: { code: Locale; label: string; flag: string }[] = [
-        { code: "en", label: "English", flag: "🇺🇸" },
         { code: "th", label: "ไทย", flag: "🇹🇭" },
+        { code: "en", label: "English", flag: "🇺🇸" },
         { code: "ja", label: "日本語", flag: "🇯🇵" },
     ];
 
