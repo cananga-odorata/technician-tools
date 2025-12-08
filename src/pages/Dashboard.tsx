@@ -130,7 +130,8 @@ const Dashboard = () => {
             <nav class="bg-secondary border-b border-border-primary px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
                 <div class="flex items-center gap-3">
                     {/* <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-accent-text font-bold text-xl shadow-lg shadow-accent/20">T</div> */}
-                    <h1 class="text-xl font-bold text-text-primary">{t("technician_dashboard")}</h1>
+                    <img src="/connectedSocial-icon-notextbg.png" alt="Logo" class="w-8 h-8 md:hidden" />
+                    <h1 class="text-xl font-bold text-text-primary hidden md:block">{t("technician_dashboard")}</h1>
                 </div>
                 <div class="flex items-center gap-4">
                     <LanguageSelector />
@@ -162,9 +163,13 @@ const Dashboard = () => {
                     </button>
                     <button
                         onClick={handleLogout}
-                        class="bg-red-500/10 text-red-500 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        class="bg-red-500/10 text-red-500 hover:bg-red-500/20 px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm font-medium transition-colors"
+                        title={t("logout")}
                     >
-                        {t("logout")}
+                        <span class="md:hidden">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        </span>
+                        <span class="hidden md:inline">{t("logout")}</span>
                     </button>
                 </div>
             </nav>

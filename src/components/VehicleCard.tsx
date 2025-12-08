@@ -2,7 +2,7 @@ import type { Component } from 'solid-js';
 import { createSignal, onCleanup, createEffect, createResource } from 'solid-js';
 import type { Vehicle, HistoryLog } from '../types';
 import { api } from '../services/api';
-import { mqttService } from '../services/mqttService';
+import { mqttService, isMqttConnected } from '../services/mqttService';
 import { t, locale } from '../i18n/config';
 
 interface VehicleCardProps {
@@ -101,7 +101,8 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
     createEffect(() => {
         if (mqttSerialNumber) {
             mqttService.subscribe(heartbeatTopic, handleMessage);
-            setStatus(mqttService.getStatus() === 'connected' ? 'connected' : 'disconnected');
+            // Don't set status here, rely on heartbeats. 
+            // Setting it here based on broker status was causing false positives/negatives.
         }
 
         onCleanup(() => {
@@ -387,7 +388,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                 <div class="tour-controls grid grid-cols-2 gap-4">
                     <button
                         onClick={() => sendCommand(true)}
-                        disabled={status() !== 'connected'}
+                        disabled={!isMqttConnected()}
                         class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <div class="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/5 transition-colors duration-300"></div>
@@ -402,7 +403,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
                     <button
                         onClick={() => sendCommand(false)}
-                        disabled={status() !== 'connected'}
+                        disabled={!isMqttConnected()}
                         class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-rose-500/10 to-rose-600/10 border border-rose-500/20 hover:border-rose-500/40 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <div class="absolute inset-0 bg-rose-500/0 group-hover:bg-rose-500/5 transition-colors duration-300"></div>
