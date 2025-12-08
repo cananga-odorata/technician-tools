@@ -5,10 +5,10 @@ const LanguageSelector: Component = () => {
     const [isOpen, setIsOpen] = createSignal(false);
     let containerRef: HTMLDivElement | undefined;
 
-    const languages: { code: Locale; label: string; flag: string }[] = [
-        { code: "th", label: "ไทย", flag: "🇹🇭" },
-        { code: "en", label: "English", flag: "🇺🇸" },
-        { code: "ja", label: "日本語", flag: "🇯🇵" },
+    const languages: { code: Locale; label: string }[] = [
+        { code: "th", label: "ไทย" },
+        { code: "en", label: "English" },
+        { code: "ja", label: "日本語" },
     ];
 
     const handleClickOutside = (e: MouseEvent) => {
@@ -31,8 +31,10 @@ const LanguageSelector: Component = () => {
                 class="flex items-center gap-2 p-2 rounded-lg hover:bg-tertiary text-text-primary transition-colors"
                 onClick={() => setIsOpen(!isOpen())}
             >
-                <span class="text-xl">{languages.find((l) => l.code === locale())?.flag}</span>
-                <span class="text-sm font-medium">{locale().toUpperCase()}</span>
+                <div class="w-8 h-6 flex items-center justify-center rounded bg-text-primary/10 text-text-primary text-xs font-bold uppercase">
+                    {locale()}
+                </div>
+                <span class="text-sm font-medium hidden sm:block">{locale().toUpperCase()}</span>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -62,7 +64,10 @@ const LanguageSelector: Component = () => {
                                 setIsOpen(false);
                             }}
                         >
-                            <span class="text-lg">{lang.flag}</span>
+                            <div class={`w-8 h-6 flex items-center justify-center rounded text-xs font-bold uppercase ${locale() === lang.code ? "bg-accent/20 text-accent" : "bg-text-secondary/10 text-text-secondary"
+                                }`}>
+                                {lang.code}
+                            </div>
                             <span>{lang.label}</span>
                         </button>
                     )}
