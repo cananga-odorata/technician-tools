@@ -6,6 +6,8 @@ import { useTheme } from '../stores/theme';
 import { mqttService } from '../services/mqttService';
 import OnboardingTour from '../components/OnboardingTour';
 import type { TourStep } from '../components/OnboardingTour';
+import { t } from '../i18n/config';
+import LanguageSelector from '../components/LanguageSelector';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -128,13 +130,14 @@ const Dashboard = () => {
             <nav class="bg-secondary border-b border-border-primary px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
                 <div class="flex items-center gap-3">
                     {/* <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-accent-text font-bold text-xl shadow-lg shadow-accent/20">T</div> */}
-                    <h1 class="text-xl font-bold text-text-primary">Technician Dashboard</h1>
+                    <h1 class="text-xl font-bold text-text-primary">{t("technician_dashboard")}</h1>
                 </div>
                 <div class="flex items-center gap-4">
+                    <LanguageSelector />
                     <div id="tour-search-bar" class="relative hidden md:block">
                         <input
                             type="text"
-                            placeholder="Search vehicles..."
+                            placeholder={t("search_placeholder")}
                             value={searchTerm()}
                             onInput={(e) => setSearchTerm(e.currentTarget.value)}
                             class="bg-tertiary border border-border-primary rounded-lg pl-10 pr-4 py-2 text-sm text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none w-64 transition-all"
@@ -145,7 +148,7 @@ const Dashboard = () => {
                         id="tour-history-btn"
                         onClick={() => navigate('/history')}
                         class="p-2 rounded-lg hover:bg-tertiary text-text-secondary transition-colors"
-                        title="Global History"
+                        title={t("global_history")}
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </button>
@@ -153,7 +156,7 @@ const Dashboard = () => {
                         id="tour-theme-toggle"
                         onClick={toggleTheme}
                         class="p-2 rounded-lg hover:bg-tertiary text-text-secondary transition-colors"
-                        title="Toggle Theme"
+                        title={t("theme_toggle")}
                     >
                         {getThemeIcon()}
                     </button>
@@ -161,21 +164,21 @@ const Dashboard = () => {
                         onClick={handleLogout}
                         class="bg-red-500/10 text-red-500 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                     >
-                        Logout
+                        {t("logout")}
                     </button>
                 </div>
             </nav>
 
             <main class="p-6 max-w-7xl mx-auto">
                 <div class="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                    <h2 class="text-2xl font-bold text-text-primary">Fleet Dashboard</h2>
+                    <h2 class="text-2xl font-bold text-text-primary">{t("fleet_dashboard")}</h2>
                 </div>
 
                 {/* Mobile Search */}
                 <div class="md:hidden mb-6">
                     <input
                         type="text"
-                        placeholder="Search vehicles..."
+                        placeholder={t("search_placeholder")}
                         value={searchTerm()}
                         onInput={(e) => setSearchTerm(e.currentTarget.value)}
                         class="w-full bg-tertiary border border-border-primary rounded-lg px-4 py-3 text-text-primary focus:border-accent outline-none"
@@ -191,13 +194,13 @@ const Dashboard = () => {
                 {vehiclesData.error && (
                     <div class="flex flex-col items-center justify-center py-12 text-center">
                         <div class="text-red-500 text-5xl mb-4">⚠️</div>
-                        <h3 class="text-xl font-bold text-text-primary mb-2">Failed to load vehicles</h3>
+                        <h3 class="text-xl font-bold text-text-primary mb-2">{t("failed_load")}</h3>
                         <p class="text-text-secondary mb-6">Could not connect to the server. Please check your connection.</p>
                         <button
                             onClick={() => window.location.reload()}
                             class="px-6 py-2 bg-accent text-accent-text rounded-lg hover:bg-accent-hover transition-colors"
                         >
-                            Retry
+                            {t("retry")}
                         </button>
                     </div>
                 )}
@@ -205,7 +208,7 @@ const Dashboard = () => {
                 {!vehiclesData.loading && !vehiclesData.error && filteredVehicles().length === 0 && (
                     <div class="flex flex-col items-center justify-center py-12 text-center">
                         <div class="text-text-tertiary text-5xl mb-4">🚐</div>
-                        <h3 class="text-xl font-bold text-text-primary mb-2">No vehicles found</h3>
+                        <h3 class="text-xl font-bold text-text-primary mb-2">{t("no_vehicles")}</h3>
                         <p class="text-text-secondary">
                             {searchTerm() ? `No vehicles match "${searchTerm()}"` : "There are no vehicles in your fleet yet."}
                         </p>
@@ -231,17 +234,17 @@ const Dashboard = () => {
                             disabled={page() === 1}
                             class="px-4 py-2 rounded-lg bg-secondary border border-border-primary text-text-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-tertiary transition-colors"
                         >
-                            Previous
+                            {t("previous")}
                         </button>
                         <span class="text-text-secondary font-medium">
-                            Page {page()} of {totalPages()}
+                            {t("page")} {page()} {t("of")} {totalPages()}
                         </span>
                         <button
                             onClick={handleNextPage}
                             disabled={page() === totalPages()}
                             class="px-4 py-2 rounded-lg bg-secondary border border-border-primary text-text-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-tertiary transition-colors"
                         >
-                            Next
+                            {t("next")}
                         </button>
                     </div>
                 )}
