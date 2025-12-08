@@ -31,9 +31,9 @@ const LanguageSelector: Component = () => {
                 class="flex items-center gap-2 p-2 rounded-lg hover:bg-tertiary text-text-primary transition-colors"
                 onClick={() => setIsOpen(!isOpen())}
             >
-                <div class="w-8 h-6 flex items-center justify-center rounded bg-text-primary/10 text-text-primary text-xs font-bold uppercase">
+                {/* <div class="w-8 h-6 flex items-center justify-center rounded bg-text-primary/10 text-text-primary text-xs font-bold uppercase">
                     {locale()}
-                </div>
+                </div> */}
                 <span class="text-sm font-medium hidden sm:block">{locale().toUpperCase()}</span>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
