@@ -352,9 +352,9 @@ const VehicleHistory = () => {
 
                                                 {/* User Info */}
                                                 <div class="mt-2 flex items-center gap-2">
-                                                    <div class="w-5 h-5 rounded-full bg-tertiary/20 flex items-center justify-center text-[10px] font-bold text-text-secondary">
+                                                    {/* <div class="w-5 h-5 rounded-full bg-tertiary/20 flex items-center justify-center text-[10px] font-bold text-text-secondary">
                                                         {log.user?.firstname?.[0] || 'U'}
-                                                    </div>
+                                                    </div> */}
                                                     <span class="text-xs text-text-secondary">
                                                         {t("by")} <span class="font-medium text-text-primary">
                                                             {log.user
