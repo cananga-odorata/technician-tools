@@ -1,6 +1,9 @@
 import { createResource, For, Show, createSignal } from 'solid-js';
 import { useNavigate, useSearchParams } from '@solidjs/router';
 import { api } from '../services/api';
+import { t } from '../i18n/config';
+import LanguageSelector from '../components/LanguageSelector';
+import { useTheme } from '../stores/theme';
 import OnboardingTour from '../components/OnboardingTour';
 import type { TourStep } from '../components/OnboardingTour';
 
@@ -8,6 +11,23 @@ const VehicleHistory = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [page, setPage] = createSignal(1);
+    const { theme, toggleTheme } = useTheme();
+
+    const getThemeIcon = () => {
+        switch (theme()) {
+            case 'light': return '☀️';
+            case 'dark': return '🌙';
+            case 'gruvbox': return '🌲';
+            case 'orange': return '🔥';
+            default: return '☀️';
+        }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/login');
+    };
 
     // Default date range: if searching by serial, use 30 days; otherwise 24 hours
     const getDefaultDates = () => {
@@ -160,23 +180,43 @@ const VehicleHistory = () => {
         <div class="min-h-screen bg-primary transition-colors duration-300">
             <OnboardingTour steps={tourSteps} tourKey="history_v1" />
             <header class="bg-secondary border-b border-border-primary sticky top-0 z-50 shadow-sm">
-                <div class="max-w-6xl mx-auto px-4 h-16 flex items-center gap-4">
-                    <button
-                        onClick={() => navigate('/')}
-                        class="p-2 rounded-full hover:bg-tertiary text-text-secondary transition-colors"
-                    >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    </button>
-                    <div class="flex-1">
-                        <h1 class="text-lg font-bold text-text-primary">System History Log</h1>
-                        <p class="text-xs text-text-tertiary">View and filter all system activities</p>
-                    </div>
-                    {searchTerm() && (
-                        <div class="hidden md:flex items-center gap-2 bg-accent/10 border border-accent/20 rounded-lg px-3 py-1.5">
-                            <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                            <span class="text-xs font-medium text-accent">Filtered: {searchTerm()}</span>
+                <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <button
+                            onClick={() => navigate('/')}
+                            class="p-2 rounded-full hover:bg-tertiary text-text-secondary transition-colors"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        </button>
+                        <div>
+                            <h1 class="text-xl font-bold text-text-primary">{t("system_history_log")}</h1>
+                            <p class="text-xs text-text-tertiary hidden sm:block">{t("view_filter_activities")}</p>
                         </div>
-                    )}
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        {searchTerm() && (
+                            <div class="hidden md:flex items-center gap-2 bg-accent/10 border border-accent/20 rounded-lg px-3 py-1.5">
+                                <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                                <span class="text-xs font-medium text-accent">{t("filtered")}: {searchTerm()}</span>
+                            </div>
+                        )}
+                        <LanguageSelector />
+                        <button
+                            id="tour-theme-toggle"
+                            onClick={toggleTheme}
+                            class="p-2 rounded-lg hover:bg-tertiary text-text-secondary transition-colors"
+                            title={t("theme_toggle")}
+                        >
+                            {getThemeIcon()}
+                        </button>
+                        <button
+                            onClick={handleLogout}
+                            class="bg-red-500/10 text-red-500 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
+                            {t("logout")}
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -186,18 +226,18 @@ const VehicleHistory = () => {
                     <div id="tour-history-filters" class="p-6 border-b border-border-secondary bg-gradient-to-br from-tertiary/30 to-tertiary/10">
                         {/* Quick Filters */}
                         <div id="tour-quick-filters" class="mb-4 flex flex-wrap gap-2">
-                            <span class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Quick Filter:</span>
-                            <button id="tour-filter-24h" onClick={() => setQuickFilter(24)} class="px-3 py-1 text-xs font-medium bg-background hover:bg-accent hover:text-accent-text border border-border-primary rounded-lg transition-colors">
-                                Last 24h
+                            <span class="text-xs font-semibold text-text-secondary uppercase tracking-wider">{t("quick_filter")}:</span>
+                            <button id="tour-filter-24h" onClick={() => setQuickFilter(24)} class="px-3 py-1 text-xs font-medium bg-tertiary hover:bg-accent text-text-primary hover:text-accent-text border border-border-primary rounded-lg transition-colors">
+                                {t("last_24h")}
                             </button>
-                            <button id="tour-filter-7d" onClick={() => setQuickFilter(24 * 7)} class="px-3 py-1 text-xs font-medium bg-background hover:bg-accent hover:text-accent-text border border-border-primary rounded-lg transition-colors">
-                                Last 7 days
+                            <button id="tour-filter-7d" onClick={() => setQuickFilter(24 * 7)} class="px-3 py-1 text-xs font-medium bg-tertiary hover:bg-accent text-text-primary hover:text-accent-text border border-border-primary rounded-lg transition-colors">
+                                {t("last_7d")}
                             </button>
-                            <button id="tour-filter-30d" onClick={() => setQuickFilter(24 * 30)} class="px-3 py-1 text-xs font-medium bg-background hover:bg-accent hover:text-accent-text border border-border-primary rounded-lg transition-colors">
-                                Last 30 days
+                            <button id="tour-filter-30d" onClick={() => setQuickFilter(24 * 30)} class="px-3 py-1 text-xs font-medium bg-tertiary hover:bg-accent text-text-primary hover:text-accent-text border border-border-primary rounded-lg transition-colors">
+                                {t("last_30d")}
                             </button>
                             <button id="tour-filter-clear" onClick={clearFilters} class="ml-auto px-3 py-1 text-xs font-medium text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 rounded-lg transition-colors">
-                                Clear All
+                                {t("clear_all")}
                             </button>
                         </div>
 
@@ -209,8 +249,8 @@ const VehicleHistory = () => {
                                     type="text"
                                     value={searchTerm()}
                                     onInput={(e) => setSearchTerm(e.currentTarget.value)}
-                                    placeholder="Enter Serial Product .."
-                                    class="w-full bg-background border border-border-primary rounded-lg px-3 py-2.5 text-sm text-text-primary focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                                    placeholder={t("search_serial_product")}
+                                    class="w-full bg-tertiary border border-border-primary rounded-lg px-3 py-2.5 text-sm text-text-primary focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                                 />
                             </div>
                             <div id="tour-date-range">
@@ -235,7 +275,7 @@ const VehicleHistory = () => {
                                 onClick={applyFilters}
                                 class="px-6 py-2.5 bg-accent text-accent-text rounded-lg text-sm font-bold hover:bg-accent-hover transition-all shadow-lg shadow-accent/20 hover:shadow-accent/30 hover:scale-105 active:scale-95"
                             >
-                                Apply Filters
+                                {t("apply_filters")}
                             </button>
                         </div>
                     </div>
@@ -245,11 +285,11 @@ const VehicleHistory = () => {
                         <div class="px-6 py-3 bg-tertiary/20 border-b border-border-secondary flex items-center justify-between text-xs">
                             <div class="flex items-center gap-4">
                                 <span class="text-text-secondary">
-                                    <span class="font-bold text-accent">{meta().total}</span> total records
+                                    <span class="font-bold text-accent">{meta().total}</span> {t("total_records")}
                                 </span>
                                 <span class="text-text-tertiary">•</span>
                                 <span class="text-text-secondary">
-                                    Showing <span class="font-bold">{(meta().page - 1) * meta().limit + 1}</span> - <span class="font-bold">{Math.min(meta().page * meta().limit, meta().total)}</span>
+                                    {t("showing")} <span class="font-bold">{(meta().page - 1) * meta().limit + 1}</span> - <span class="font-bold">{Math.min(meta().page * meta().limit, meta().total)}</span>
                                 </span>
                             </div>
                             <div class="text-text-tertiary">
@@ -263,7 +303,7 @@ const VehicleHistory = () => {
                         <Show when={!historyData.loading} fallback={
                             <div class="p-16 text-center">
                                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
-                                <p class="text-text-tertiary font-medium">Loading history...</p>
+                                <p class="text-text-tertiary font-medium">{t("loading_history")}</p>
                             </div>
                         }>
                             <For each={logs()}>
@@ -316,10 +356,10 @@ const VehicleHistory = () => {
                                                         {log.user?.firstname?.[0] || 'U'}
                                                     </div>
                                                     <span class="text-xs text-text-secondary">
-                                                        by <span class="font-medium text-text-primary">
+                                                        {t("by")} <span class="font-medium text-text-primary">
                                                             {log.user
                                                                 ? `${log.user.titlename || ''} ${log.user.firstname} ${log.user.lastname}`.trim()
-                                                                : 'Unknown User'
+                                                                : t("unknown_user")
                                                             }
                                                         </span>
                                                     </span>
@@ -331,8 +371,8 @@ const VehicleHistory = () => {
                             {logs().length === 0 && (
                                 <div class="p-16 text-center text-text-tertiary">
                                     <div class="text-6xl mb-4">📜</div>
-                                    <p class="text-lg font-medium mb-2">No history records found</p>
-                                    <p class="text-sm">Try adjusting your filters or date range</p>
+                                    <p class="text-lg font-medium mb-2">{t("no_history_found")}</p>
+                                    <p class="text-sm">{t("adjust_filters")}</p>
                                 </div>
                             )}
                         </Show>
@@ -350,9 +390,9 @@ const VehicleHistory = () => {
                                     <button
                                         onClick={handlePrevPage}
                                         disabled={page() === 1}
-                                        class="px-3 py-2 rounded-lg bg-background border border-border-primary text-text-primary text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-accent hover:text-accent-text hover:border-accent transition-all"
+                                        class="px-3 py-2 rounded-lg bg-tertiary border border-border-primary text-text-primary text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-accent hover:text-accent-text hover:border-accent transition-all"
                                     >
-                                        ← Previous
+                                        ← {t("previous")}
                                     </button>
 
                                     <div class="hidden md:flex items-center gap-1">
@@ -376,9 +416,9 @@ const VehicleHistory = () => {
                                     <button
                                         onClick={handleNextPage}
                                         disabled={page() === meta().totalPages}
-                                        class="px-3 py-2 rounded-lg bg-background border border-border-primary text-text-primary text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-accent hover:text-accent-text hover:border-accent transition-all"
+                                        class="px-3 py-2 rounded-lg bg-tertiary border border-border-primary text-text-primary text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-accent hover:text-accent-text hover:border-accent transition-all"
                                     >
-                                        Next →
+                                        {t("next")} →
                                     </button>
                                 </div>
                             </div>
