@@ -244,7 +244,7 @@ const VehicleHistory = () => {
                         {/* Custom Filters */}
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                             <div id="tour-search-input" class="md:col-span-1">
-                                <label class="block text-xs font-medium text-text-secondary mb-1.5">🔍 Search Serial Product</label>
+                                <label class="block text-xs font-medium text-text-secondary mb-1.5">🔍 {t("search_serial_product")}</label>
                                 <input
                                     type="text"
                                     value={searchTerm()}
@@ -254,21 +254,21 @@ const VehicleHistory = () => {
                                 />
                             </div>
                             <div id="tour-date-range">
-                                <label class="block text-xs font-medium text-text-secondary mb-1.5">📅 Start Date</label>
+                                <label class="block text-xs font-medium text-text-secondary mb-1.5">📅 {t("start_date")}</label>
                                 <input
                                     type="datetime-local"
                                     value={startDate()}
                                     onInput={(e) => setStartDate(e.currentTarget.value)}
-                                    class="w-full bg-background border border-border-primary rounded-lg px-3 py-2.5 text-sm text-text-primary focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                                    class="w-full bg-tertiary border border-border-primary rounded-lg px-3 py-2.5 text-sm text-text-primary focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                                 />
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-text-secondary mb-1.5">📅 End Date</label>
+                                <label class="block text-xs font-medium text-text-secondary mb-1.5">📅 {t("end_date")}</label>
                                 <input
                                     type="datetime-local"
                                     value={endDate()}
                                     onInput={(e) => setEndDate(e.currentTarget.value)}
-                                    class="w-full bg-background border border-border-primary rounded-lg px-3 py-2.5 text-sm text-text-primary focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                                    class="w-full bg-tertiary border border-border-primary rounded-lg px-3 py-2.5 text-sm text-text-primary focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                                 />
                             </div>
                             <button

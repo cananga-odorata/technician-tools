@@ -3,6 +3,7 @@ import { createSignal, onCleanup, createEffect, createResource } from 'solid-js'
 import type { Vehicle, HistoryLog } from '../types';
 import { api } from '../services/api';
 import { mqttService } from '../services/mqttService';
+import { t, locale } from '../i18n/config';
 
 interface VehicleCardProps {
     vehicle: Vehicle;
@@ -49,7 +50,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
             const last = lastUpdate();
             if (last) {
                 const diff = Math.floor((new Date().getTime() - last.getTime()) / 1000);
-                setTimeAgo(`${diff}s ago`);
+                setTimeAgo(`${diff}s ${t("ago") || "ago"}`); // Fallback if ago is missing, though usually it's better to add it
             }
         }, 1000);
         onCleanup(() => clearInterval(interval));
@@ -59,8 +60,8 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
     const topic = mqttSerialNumber ? `vehicle/${mqttSerialNumber}/wrstatus` : '';
     const heartbeatTopic = mqttSerialNumber ? `vehicle/${mqttSerialNumber}/realtime_heartbeat` : '';
 
-    const handleMessage = (t: string, message: Buffer) => {
-        if (t === heartbeatTopic) {
+    const handleMessage = (topic: string, message: Buffer) => {
+        if (topic === heartbeatTopic) {
             setIsOnline(true);
             setStatus('connected');
             try {
@@ -84,7 +85,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
                     setLatestData(newData);
                     setLastUpdate(new Date());
-                    setTimeAgo('0s ago');
+                    setTimeAgo(`0s ${t("ago") || "ago"}`);
                 }
             } catch (e) {
                 console.error('Failed to parse heartbeat:', e);
@@ -133,12 +134,12 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
     const getModeInfo = (mode: number) => {
         switch (mode) {
-            case 0: return { label: 'Offline', color: 'text-gray-400', bg: 'bg-gray-500/10', border: 'border-gray-500/20' };
-            case 1: return { label: 'ทำงาน', color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/20' };
-            case 2: return { label: 'หยุด รีเลย์ 1', color: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/20' };
-            case 3: return { label: 'หยุด รีเลย์ 2', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/20' };
-            case 6: return { label: 'โหมด PM', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20' };
-            default: return { label: `Mode ${mode}`, color: 'text-text-secondary', bg: 'bg-tertiary', border: 'border-border-secondary' };
+            case 0: return { label: t("offline"), color: 'text-gray-400', bg: 'bg-gray-500/10', border: 'border-gray-500/20' };
+            case 1: return { label: t("mode_working"), color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/20' };
+            case 2: return { label: t("mode_stop_relay1"), color: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/20' };
+            case 3: return { label: t("mode_stop_relay2"), color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/20' };
+            case 6: return { label: t("mode_pm"), color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20' };
+            default: return { label: `${t("mode")} ${mode}`, color: 'text-text-secondary', bg: 'bg-tertiary', border: 'border-border-secondary' };
         }
     };
 
@@ -171,7 +172,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                             ? 'bg-yellow-500/15 text-yellow-500 border-yellow-500/30'
                             : 'bg-red-500/15 text-red-500 border-red-500/30'
                         }`}>
-                        {props.vehicle.status}
+                        {props.vehicle.status === 'active' ? t("status_active") : props.vehicle.status === 'maintenance' ? t("status_maintenance") : t("status_inactive")}
                     </span>
                 </div>
 
@@ -197,7 +198,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                             ? 'bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]'
                             : 'bg-gray-400'
                             }`}></div>
-                        {status() === 'connected' ? 'Connected' : 'Offline'}
+                        {status() === 'connected' ? t("connected") : t("offline")}
                     </span>
                 </div>
             </div>
@@ -216,7 +217,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                             </div>
                             <span class={`text-xs font-bold uppercase tracking-wider ${parsedData() ? 'text-green-500' : 'text-yellow-500'
                                 }`}>
-                                {parsedData() ? 'Live Telemetry' : 'Waiting...'}
+                                {parsedData() ? t("live_telemetry") : t("waiting")}
                             </span>
                         </div>
                         {parsedData() && (
@@ -233,7 +234,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                                 }`}>
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-lg">⚙️</span>
-                                    <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">Mode</span>
+                                    <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">{t("mode")}</span>
                                 </div>
                                 <div class="flex flex-col">
                                     <span class="text-2xl font-bold text-text-primary font-mono leading-none mb-1">{parsedData()?.mode}</span>
@@ -248,7 +249,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                                 }`}>
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-lg">🌡️</span>
-                                    <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">Temperature</span>
+                                    <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">{t("temperature")}</span>
                                 </div>
                                 <div class="flex items-baseline gap-1">
                                     <span class="text-2xl font-bold text-text-primary font-mono">{parsedData()?.temp}</span>
@@ -269,7 +270,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                                 }`}>
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-lg">⚡</span>
-                                    <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">Voltage</span>
+                                    <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">{t("voltage")}</span>
                                 </div>
                                 <div class="flex items-baseline gap-1">
                                     <span class="text-2xl font-bold text-text-primary font-mono">{parsedData()?.voltage}</span>
@@ -290,7 +291,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                                 }`}>
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-lg">⏱️</span>
-                                    <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">Session</span>
+                                    <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">{t("session")}</span>
                                 </div>
                                 <div class="flex items-baseline gap-1">
                                     <span class="text-2xl font-bold text-text-primary font-mono">
@@ -309,26 +310,26 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                                 }`}>
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-lg">📊</span>
-                                    <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">Total Usage Time</span>
+                                    <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">{t("total_usage_time")}</span>
                                 </div>
                                 <div class="flex items-baseline gap-2">
                                     <span class="text-2xl font-bold text-text-primary font-mono">
                                         {Math.floor(parsedData()!.total_usage_time / 60)}
                                     </span>
-                                    <span class="text-sm text-text-secondary">minutes</span>
+                                    <span class="text-sm text-text-secondary">{t("minutes")}</span>
                                     <span class="text-lg font-bold text-text-primary font-mono">
                                         {parsedData()!.total_usage_time % 60}
                                     </span>
-                                    <span class="text-sm text-text-secondary">seconds</span>
+                                    <span class="text-sm text-text-secondary">{t("seconds")}</span>
                                     <span class="ml-auto text-xs text-text-tertiary bg-tertiary/50 px-2 py-1 rounded">
-                                        {(parsedData()!.total_usage_time / 3600).toFixed(2)} hrs
+                                        {(parsedData()!.total_usage_time / 3600).toFixed(2)} {t("hours") || "hrs"}
                                     </span>
                                 </div>
                             </div>
                         </div>
                     ) : (
                         <div class="font-mono text-xs text-text-secondary bg-background/60 px-3 py-2.5 rounded-lg border border-border-secondary/50 text-center">
-                            Listening for heartbeat...
+                            {t("listening_heartbeat")}
                         </div>
                     )}
                 </div>
@@ -339,10 +340,10 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
             {recentHistory() && recentHistory()!.data.length > 0 && (
                 <div class="px-5 pb-3">
                     <div class="bg-tertiary/30 rounded-xl border border-border-secondary/50 overflow-hidden">
-                        <div class="px-3 py-2 border-b border-border-secondary/50 flex items-center justify-between">
-                            <span class="text-xs font-bold text-text-secondary uppercase tracking-wider">Recent Activity</span>
-                            <span class="text-[10px] text-text-tertiary bg-background/50 px-2 py-0.5 rounded">
-                                {recentHistory()!.meta.total} total
+                        <div class="px-3 py-2 border-b border-border-secondary/50 flex items-center justify-center">
+                            <span class="text-xs font-bold text-text-secondary uppercase tracking-wider">{t("recent_activity")}</span>
+                            <span class="text-[10px] text-text-tertiary bg-background/50 px-2 py-0.5 rounded ml-auto">
+                                {recentHistory()!.meta.total} {t("total")}
                             </span>
                         </div>
                         <div class="divide-y divide-border-secondary/30">
@@ -364,7 +365,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                                             <div class="flex-1 min-w-0">
                                                 <p class="text-xs font-medium text-text-primary truncate">{log.details}</p>
                                                 <p class="text-[10px] text-text-tertiary">
-                                                    {new Date(log.created_at).toLocaleString('th-TH', {
+                                                    {new Date(log.created_at).toLocaleString((locale() == 'th' ? 'th-TH' : (locale() == 'ja' ? 'ja-JP' : 'en-US')), {
                                                         month: 'short',
                                                         day: 'numeric',
                                                         hour: '2-digit',
@@ -394,8 +395,8 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                             <div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform duration-300">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                             </div>
-                            <span class="text-emerald-600 font-bold text-sm">เปิดใช้งานรถ</span>
-                            <span class="text-[10px] text-emerald-600/60 uppercase tracking-wider font-medium">Activate</span>
+                            <span class="text-emerald-600 font-bold text-sm">{t("activate_vehicle")}</span>
+                            <span class="text-[10px] text-emerald-600/60 uppercase tracking-wider font-medium">{t("activate")}</span>
                         </div>
                     </button>
 
@@ -409,8 +410,8 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                             <div class="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform duration-300">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </div>
-                            <span class="text-rose-600 font-bold text-sm">ปิดใช้งานรถ</span>
-                            <span class="text-[10px] text-rose-600/60 uppercase tracking-wider font-medium">Deactivate</span>
+                            <span class="text-rose-600 font-bold text-sm">{t("deactivate_vehicle")}</span>
+                            <span class="text-[10px] text-rose-600/60 uppercase tracking-wider font-medium">{t("deactivate")}</span>
                         </div>
                     </button>
                 </div>
@@ -422,7 +423,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                     <svg class="w-4 h-4 text-text-tertiary group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    View History Log
+                    {t("view_history_log")}
                 </a>
             </div>
 
