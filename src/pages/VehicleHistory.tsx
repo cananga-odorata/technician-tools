@@ -54,9 +54,9 @@ const VehicleHistory = () => {
             const startISO = new Date(start).toISOString();
             const endISO = new Date(end).toISOString();
 
-            // console.log('Fetching history:', { page, startISO, endISO, search });
+            console.log('Fetching history:', { page, startISO, endISO, search });
             const result = await api.getHistory(page, 5, startISO, endISO, search);
-            // console.log('History result:', result);
+            console.log('History result:', result);
             return result;
         }
     );

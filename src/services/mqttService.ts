@@ -1,12 +1,22 @@
 import mqtt from 'mqtt';
 import { mqttConfig } from '../config/mqtt';
+import { createSignal } from 'solid-js';
 
 type MessageHandler = (topic: string, message: Buffer) => void;
+
+// Create a reactive signal for connection status outside the class
+// to avoid complexity with 'this' binding if passed around, 
+// though valid as class property too.
+const [isConnectedSignal, setIsConnectedSignal] = createSignal(false);
 
 class MQTTService {
     private client: mqtt.MqttClient | null = null;
     private subscribers: Map<string, Set<MessageHandler>> = new Map();
-    private isConnected = false;
+    // private isConnected = false; // logic moved to signal
+
+    get isConnected() {
+        return isConnectedSignal();
+    }
 
     constructor() {
         // Private constructor to enforce singleton usage if we wanted strict singleton,
@@ -21,7 +31,7 @@ class MQTTService {
 
         this.client.on('connect', () => {
             console.log('Shared MQTT Connected');
-            this.isConnected = true;
+            setIsConnectedSignal(true);
             // Resubscribe to all topics if we reconnected
             this.subscribers.forEach((_, topic) => {
                 this.client?.subscribe(topic, (err) => {
@@ -43,7 +53,7 @@ class MQTTService {
 
         this.client.on('close', () => {
             console.log('Shared MQTT Disconnected');
-            this.isConnected = false;
+            setIsConnectedSignal(false);
         });
     }
 
@@ -95,7 +105,7 @@ class MQTTService {
         if (this.client) {
             this.client.end();
             this.client = null;
-            this.isConnected = false;
+            setIsConnectedSignal(false);
         }
     }
 
@@ -105,3 +115,5 @@ class MQTTService {
 }
 
 export const mqttService = new MQTTService();
+// Export the signal accessor directly for easy use in components
+export const isMqttConnected = isConnectedSignal;
