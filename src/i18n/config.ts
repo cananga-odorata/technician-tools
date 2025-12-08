@@ -14,7 +14,7 @@ const dictionaries = {
 
 // Default locale or get from localStorage
 const storedLocale = localStorage.getItem("locale") as Locale;
-const initialLocale: Locale = storedLocale && dictionaries[storedLocale] ? storedLocale : "en";
+const initialLocale: Locale = storedLocale && dictionaries[storedLocale] ? storedLocale : "th";
 
 export const [locale, setLocale] = createSignal<Locale>(initialLocale);
 
