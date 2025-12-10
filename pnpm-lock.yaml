@@ -20,6 +20,9 @@ importers:
       solid-js:
         specifier: ^1.9.9
         version: 1.9.9
+      sweetalert2:
+        specifier: ^11.26.4
+        version: 11.26.4
       tailwindcss:
         specifier: ^4.1.15
         version: 4.1.15
@@ -885,6 +888,9 @@ packages:
 
   string_decoder@1.3.0:
     resolution: {integrity: sha512-hkRX8U1WjJFd8LsDJ2yQ/wWWxaopEsABU1XfkM8A+j0+85JAGppt16cr1Whg6KIbb4okU6Mql6BOj+uup/wKeA==}
+
+  sweetalert2@11.26.4:
+    resolution: {integrity: sha512-qIgIQOVoz85Xj2Rij+htVFNH+HiIgfSR8ZJsHQvX4p9uLtJveXVqU7vPxJ4Eo6SALnLeo0Sw6COY164Zg3oBiw==}
 
   tailwindcss@4.1.15:
     resolution: {integrity: sha512-k2WLnWkYFkdpRv+Oby3EBXIyQC8/s1HOFMBUViwtAh6Z5uAozeUSMQlIsn/c6Q2iJzqG6aJT3wdPaRNj70iYxQ==}
@@ -1764,6 +1770,8 @@ snapshots:
   string_decoder@1.3.0:
     dependencies:
       safe-buffer: 5.2.1
+
+  sweetalert2@11.26.4: {}
 
   tailwindcss@4.1.15: {}
 
