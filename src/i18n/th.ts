@@ -10,7 +10,7 @@ export const dict = {
     dark_mode: "โหมดมืด",
     light_mode: "โหมดสว่าง",
     technician_dashboard: "แดชบอร์ดช่างเทคนิค",
-    search_placeholder: "ค้นหายานพาหนะ...",
+    search_placeholder: "ค้นหายานพาหนะ (ระบุ SN/รุ่น)...",
     global_history: "ประวัติรวม",
     fleet_dashboard: "แดชบอร์ดฟลีท",
     failed_load: "ไม่สามารถโหลดข้อมูลยานพาหนะ",
