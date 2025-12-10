@@ -13,6 +13,7 @@
     "@tailwindcss/vite": "^4.1.15",
     "mqtt": "^5.14.1",
     "solid-js": "^1.9.9",
+    "sweetalert2": "^11.26.4",
     "tailwindcss": "^4.1.15"
   },
   "devDependencies": {

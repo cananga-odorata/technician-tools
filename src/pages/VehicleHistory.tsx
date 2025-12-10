@@ -122,56 +122,56 @@ const VehicleHistory = () => {
 
     const tourSteps: TourStep[] = [
         {
-            title: 'History Log Overview',
-            content: 'Welcome to the History Log. Here you can review all past activities and commands performed on your fleet.',
+            title: t("tour_history_title"),
+            content: t("tour_history_content"),
             position: 'bottom'
         },
         {
             target: '#tour-filter-24h',
-            title: 'Last 24 Hours',
-            content: 'Click here to instantly filter logs from the past 24 hours.',
+            title: t("tour_filter_24h_title"),
+            content: t("tour_filter_24h_content"),
             position: 'bottom'
         },
         {
             target: '#tour-filter-7d',
-            title: 'Last 7 Days',
-            content: 'View history logs for the past week.',
+            title: t("tour_filter_7d_title"),
+            content: t("tour_filter_7d_content"),
             position: 'bottom'
         },
         {
             target: '#tour-filter-30d',
-            title: 'Last 30 Days',
-            content: 'See a broader history of activities over the last month.',
+            title: t("tour_filter_30d_title"),
+            content: t("tour_filter_30d_content"),
             position: 'bottom'
         },
         {
             target: '#tour-filter-clear',
-            title: 'Clear Filters',
-            content: 'Reset all active filters and show the default view.',
+            title: t("tour_filter_clear_title"),
+            content: t("tour_filter_clear_content"),
             position: 'bottom'
         },
         {
             target: '#tour-search-input',
-            title: 'Search by Serial',
-            content: 'Enter a specific Serial Number or Product ID to find history logs for a particular vehicle.',
+            title: t("tour_search_serial_title"),
+            content: t("tour_search_serial_content"),
             position: 'bottom'
         },
         {
             target: '#tour-date-range',
-            title: 'Date Range Search',
-            content: 'Select a custom Start and End date to view history logs within a specific time period.',
+            title: t("tour_date_range_title"),
+            content: t("tour_date_range_content"),
             position: 'bottom'
         },
         {
             target: '#tour-history-list',
-            title: 'Activity Logs',
-            content: 'This list shows detailed information about each action, including who performed it, when it happened, and the result.',
+            title: t("tour_activity_list_title"),
+            content: t("tour_activity_list_content"),
             position: 'top'
         },
         {
             target: '#tour-history-pagination',
-            title: 'Pagination',
-            content: 'Navigate through pages of history records using these controls.',
+            title: t("tour_pagination_title"),
+            content: t("tour_pagination_content"),
             position: 'top'
         }
     ];

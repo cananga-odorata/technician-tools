@@ -13,6 +13,7 @@ const Dashboard = () => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useTheme();
     const [page, setPage] = createSignal(1);
+    const [limit, setLimit] = createSignal(8);
     const [searchTerm, setSearchTerm] = createSignal('');
 
     // Initialize shared MQTT connection
@@ -39,8 +40,8 @@ const Dashboard = () => {
 
     // Fetch data when page or searchTerm changes
     const [vehiclesData] = createResource(
-        () => ({ page: page(), search: searchTerm() }),
-        async ({ page, search }) => api.getVehicles(page, 8, search)
+        () => ({ page: page(), limit: limit(), search: searchTerm() }),
+        async ({ page, limit, search }) => api.getVehicles(page, limit, search)
     );
 
     const filteredVehicles = () => {
@@ -76,50 +77,50 @@ const Dashboard = () => {
 
     const tourSteps: TourStep[] = [
         {
-            title: 'Welcome to Technician Dashboard',
-            content: 'This is your central hub for monitoring and managing the vehicle fleet. You can see real-time status and control vehicles from here.',
+            title: t("tour_dashboard_title"),
+            content: t("tour_dashboard_content"),
             position: 'bottom'
         },
         {
             target: '#tour-search-bar',
-            title: 'Quick Search',
-            content: 'Quickly find specific vehicles by entering their serial number, model, or other details here.',
+            title: t("tour_search_title"),
+            content: t("tour_search_content"),
             position: 'bottom'
         },
         {
             target: '#tour-history-btn',
-            title: 'Global History',
-            content: 'View the complete history log for all vehicles in the fleet. Useful for auditing overall system activity.',
+            title: t("tour_history_btn_title"),
+            content: t("tour_history_btn_content"),
             position: 'bottom'
         },
         {
             target: '#tour-theme-toggle',
-            title: 'Theme Switcher',
-            content: 'Toggle between Light, Dark, and other themes to suit your working environment.',
+            title: t("tour_theme_title"),
+            content: t("tour_theme_content"),
             position: 'bottom'
         },
         {
             target: '#tour-vehicle-card',
-            title: 'Vehicle Card',
-            content: 'Each card represents a vehicle in your fleet. It displays key information like serial number, model, and connection status.',
+            title: t("tour_card_title"),
+            content: t("tour_card_content"),
             position: 'bottom'
         },
         {
             target: '#tour-vehicle-card .tour-status-badge',
-            title: 'Connection Status',
-            content: 'Check if the vehicle is currently online and communicating with the server. Green means online, Gray means offline.',
+            title: t("tour_status_title"),
+            content: t("tour_status_content"),
             position: 'bottom'
         },
         {
             target: '#tour-vehicle-card .tour-controls',
-            title: 'Remote Controls',
-            content: 'Use these buttons to send commands to the vehicle. You can Activate (Open) or Deactivate (Close) the vehicle remotely.',
+            title: t("tour_controls_title"),
+            content: t("tour_controls_content"),
             position: 'top'
         },
         {
             target: '#tour-vehicle-card .tour-history-link',
-            title: 'History Log',
-            content: 'Click here to view a detailed history of all commands and activities for this specific vehicle.',
+            title: t("tour_history_link_title"),
+            content: t("tour_history_link_content"),
             position: 'top'
         }
     ];
@@ -177,6 +178,23 @@ const Dashboard = () => {
             <main class="p-6 max-w-7xl mx-auto">
                 <div class="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                     <h2 class="text-2xl font-bold text-text-primary">{t("fleet_dashboard")}</h2>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-text-secondary hidden sm:inline">{t("items_per_page")}:</span>
+                        <select
+                            value={limit()}
+                            onChange={(e) => {
+                                setLimit(Number(e.currentTarget.value));
+                                setPage(1);
+                            }}
+                            class="bg-tertiary border border-border-primary rounded-lg px-2 py-1 text-sm text-text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none cursor-pointer"
+                        >
+                            <option value={8}>8</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={30}>30</option>
+                            <option value={50}>50</option>
+                        </select>
+                    </div>
                 </div>
 
                 {/* Mobile Search */}
