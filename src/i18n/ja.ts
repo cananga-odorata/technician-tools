@@ -10,7 +10,7 @@ export const dict = {
     dark_mode: "ダークモード",
     light_mode: "ライトモード",
     technician_dashboard: "技術者ダッシュボード",
-    search_placeholder: "車両を検索...",
+    search_placeholder: "車両を検索 (SN/モデル)...",
     global_history: "グローバル履歴",
     fleet_dashboard: "フリートダッシュボード",
     failed_load: "車両の読み込みに失敗しました",

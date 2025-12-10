@@ -10,7 +10,7 @@ export const dict = {
     dark_mode: "Dark Mode",
     light_mode: "Light Mode",
     technician_dashboard: "Technician Dashboard",
-    search_placeholder: "Search vehicles...",
+    search_placeholder: "Search vehicles (SN/Model)...",
     global_history: "Global History",
     fleet_dashboard: "Fleet Dashboard",
     failed_load: "Failed to load vehicles",

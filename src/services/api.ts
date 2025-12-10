@@ -10,6 +10,19 @@ const getHeaders = () => {
     };
 };
 
+const handleResponse = async (response: Response) => {
+    if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        throw new Error('Session expired');
+    }
+    if (!response.ok) {
+        throw new Error(response.statusText || 'API request failed');
+    }
+    return response;
+};
+
 export const api = {
     login: async (username: string, password: string): Promise<AuthResponse> => {
         const response = await fetch(`${BASE_URL}/auth/login`, {
@@ -46,11 +59,9 @@ export const api = {
         // Use the endpoint provided by the user
         const response = await fetch(`${BASE_URL}/technician/fleet-boxes?page=${page}&limit=${limit}&search=${search}`, {
             headers: getHeaders(),
-        });
+        }).then(handleResponse);
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch dashboard data');
-        }
+        // handleResponse throws if !ok, so we can safely get json here
 
         const json = await response.json();
         const items = json.data || [];
@@ -95,29 +106,34 @@ export const api = {
         const url = `${BASE_URL}/technician/history?${params.toString()}`;
         // console.log('Fetching history from:', url);
 
-        const response = await fetch(url, {
-            headers: getHeaders(),
-        });
+        // console.log('Fetching history from:', url);
 
-        if (!response.ok) {
-            console.warn('Failed to fetch history:', response.status, response.statusText);
+        try {
+            const response = await fetch(url, {
+                headers: getHeaders(),
+            }).then(handleResponse);
+
+            const data = await response.json();
+            // console.log('History data:', data);
+            return data;
+        } catch (error) {
+            console.warn('Failed to fetch history:', error);
             return { data: [], meta: { total: 0, page: 1, limit: limit, totalPages: 1 } };
         }
-
-        const data = await response.json();
-        // console.log('History data:', data);
-        return data;
     },
 
-    logAction: async (action: string, details: string, fb_id?: number, fp_id?: number): Promise<void> => {
-        const response = await fetch(`${BASE_URL}/technician/log`, {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify({ action, details, fb_id, fp_id })
-        });
+    // Helper function to avoid 'response' shadowing issues if we were to restructure differently,
+    // but the above try/catch block replaces lines 98-109 cleanly.
 
-        if (!response.ok) {
-            console.error('Failed to log action');
+    logAction: async (action: string, details: string, fb_id?: number, fp_id?: number): Promise<void> => {
+        try {
+            await fetch(`${BASE_URL}/technician/log`, {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify({ action, details, fb_id, fp_id })
+            }).then(handleResponse);
+        } catch (error) {
+            console.error('Failed to log action', error);
         }
     }
 };
