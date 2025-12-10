@@ -2,8 +2,9 @@ import type { Component } from 'solid-js';
 import { createSignal, onCleanup, createEffect, createResource } from 'solid-js';
 import type { Vehicle, HistoryLog } from '../types';
 import { api } from '../services/api';
-import { mqttService } from '../services/mqttService';
+import { mqttService, isMqttConnected } from '../services/mqttService';
 import { t, locale } from '../i18n/config';
+import Swal from 'sweetalert2';
 
 interface VehicleCardProps {
     vehicle: Vehicle;
@@ -101,7 +102,8 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
     createEffect(() => {
         if (mqttSerialNumber) {
             mqttService.subscribe(heartbeatTopic, handleMessage);
-            setStatus(mqttService.getStatus() === 'connected' ? 'connected' : 'disconnected');
+            // Don't set status here, rely on heartbeats. 
+            // Setting it here based on broker status was causing false positives/negatives.
         }
 
         onCleanup(() => {
@@ -112,7 +114,22 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
         });
     });
 
-    const sendCommand = (isOpen: boolean) => {
+    const sendCommand = async (isOpen: boolean) => {
+        const result = await Swal.fire({
+            title: isOpen ? t("confirm_activate_title") : t("confirm_deactivate_title"),
+            text: isOpen ? t("confirm_activate_text") : t("confirm_deactivate_text"),
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: isOpen ? '#10b981' : '#f43f5e',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: t("confirm_yes"),
+            cancelButtonText: t("confirm_cancel"),
+            background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+            color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937'
+        });
+
+        if (!result.isConfirmed) return;
+
         if (!mqttSerialNumber) return;
 
         const payload = JSON.stringify({
@@ -130,6 +147,16 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
             props.vehicle.fp_id
         );
         setTimeout(() => setLastCommand(null), 2000);
+
+        Swal.fire({
+            title: t("success_title"),
+            text: isOpen ? t("success_activate_text") : t("success_deactivate_text"),
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false,
+            background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+            color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937'
+        });
     };
 
     const getModeInfo = (mode: number) => {
@@ -387,7 +414,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                 <div class="tour-controls grid grid-cols-2 gap-4">
                     <button
                         onClick={() => sendCommand(true)}
-                        disabled={status() !== 'connected'}
+                        disabled={!isMqttConnected()}
                         class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <div class="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/5 transition-colors duration-300"></div>
@@ -402,7 +429,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
                     <button
                         onClick={() => sendCommand(false)}
-                        disabled={status() !== 'connected'}
+                        disabled={!isMqttConnected()}
                         class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-rose-500/10 to-rose-600/10 border border-rose-500/20 hover:border-rose-500/40 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <div class="absolute inset-0 bg-rose-500/0 group-hover:bg-rose-500/5 transition-colors duration-300"></div>
