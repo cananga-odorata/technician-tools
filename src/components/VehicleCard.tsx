@@ -124,8 +124,11 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
             cancelButtonColor: '#6b7280',
             confirmButtonText: t("confirm_yes"),
             cancelButtonText: t("confirm_cancel"),
-            background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-            color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937'
+            customClass: {
+                popup: '!bg-secondary !text-text-primary border !border-border-primary rounded-2xl',
+                title: '!text-text-primary',
+                htmlContainer: '!text-text-secondary'
+            }
         });
 
         if (!result.isConfirmed) return;
@@ -154,8 +157,11 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
             icon: 'success',
             timer: 2000,
             showConfirmButton: false,
-            background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-            color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937'
+            customClass: {
+                popup: '!bg-secondary !text-text-primary border !border-border-primary rounded-2xl',
+                title: '!text-text-primary',
+                htmlContainer: '!text-text-secondary'
+            }
         });
     };
 
