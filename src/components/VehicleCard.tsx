@@ -183,10 +183,11 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                 <div class="flex items-start justify-between gap-4 mb-3">
                     <div class="flex-1 min-w-0">
                         <h3
-                            class={`text-2xl font-bold text-text-primary mb-1.5 cursor-pointer hover:text-accent transition-colors ${isSerialExpanded() ? 'whitespace-normal break-all' : 'truncate'}`}
+                            class={`text-2xl font-bold text-text-primary mb-1.5 cursor-pointer hover:text-accent transition-colors flex items-center gap-2 ${isSerialExpanded() ? 'whitespace-normal break-all' : 'truncate'}`}
                             onClick={() => setIsSerialExpanded(!isSerialExpanded())}
                             title={props.vehicle.serial_number}
                         >
+                            <span class="text-sm font-bold text-text-tertiary uppercase tracking-wider bg-tertiary/50 px-2 py-0.5 rounded border border-border-secondary/50">SN</span>
                             {props.vehicle.serial_number}
                         </h3>
                         <p
@@ -219,7 +220,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                     )}
                     {props.vehicle.box_serial_number && (
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs bg-tertiary/80 text-text-tertiary border border-border-secondary font-mono">
-                            <span class="opacity-70">📦</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider bg-border-secondary/50 px-1.5 rounded text-text-secondary">SN BOX</span>
                             {props.vehicle.box_serial_number}
                         </span>
                     )}
