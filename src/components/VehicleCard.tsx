@@ -4,6 +4,7 @@ import type { Vehicle, HistoryLog } from '../types';
 import { api } from '../services/api';
 import { mqttService, isMqttConnected } from '../services/mqttService';
 import { t, locale } from '../i18n/config';
+import Swal from 'sweetalert2';
 
 interface VehicleCardProps {
     vehicle: Vehicle;
@@ -113,7 +114,22 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
         });
     });
 
-    const sendCommand = (isOpen: boolean) => {
+    const sendCommand = async (isOpen: boolean) => {
+        const result = await Swal.fire({
+            title: isOpen ? t("confirm_activate_title") : t("confirm_deactivate_title"),
+            text: isOpen ? t("confirm_activate_text") : t("confirm_deactivate_text"),
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: isOpen ? '#10b981' : '#f43f5e',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: t("confirm_yes"),
+            cancelButtonText: t("confirm_cancel"),
+            background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+            color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937'
+        });
+
+        if (!result.isConfirmed) return;
+
         if (!mqttSerialNumber) return;
 
         const payload = JSON.stringify({
@@ -131,6 +147,16 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
             props.vehicle.fp_id
         );
         setTimeout(() => setLastCommand(null), 2000);
+
+        Swal.fire({
+            title: t("success_title"),
+            text: isOpen ? t("success_activate_text") : t("success_deactivate_text"),
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false,
+            background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+            color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937'
+        });
     };
 
     const getModeInfo = (mode: number) => {
