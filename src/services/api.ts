@@ -4,17 +4,25 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const getHeaders = () => {
     const token = localStorage.getItem('token');
+    // Ensure we don't send "undefined" or "null" strings as tokens
+    const validToken = token && token !== 'undefined' && token !== 'null';
     return {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(validToken ? { Authorization: `Bearer ${token}` } : {}),
     };
 };
 
 const handleResponse = async (response: Response) => {
     if (response.status === 401) {
+        // Session expired or invalid token
+        console.warn('Session expired or unauthorized, redirecting to login...');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+
+        // Use replace to prevent back-button looping
+        window.location.replace('/login');
+
+        // Throwing error to interrupt the promise chain
         throw new Error('Session expired');
     }
     if (!response.ok) {
@@ -36,6 +44,11 @@ export const api = {
         }
 
         const data = await response.json();
+
+        if (!data.access_token) {
+            throw new Error('Invalid server response: No access token received');
+        }
+
         // The API returns { access_token: string }, we map it to our AuthResponse
         // We might need to fetch user details separately or decode the token if the API doesn't return user info.
         // For now, let's assume we construct a basic user object or the API returns it.
@@ -43,13 +56,13 @@ export const api = {
         return {
             token: data.access_token,
             user: {
-                id: 1, // Placeholder
-                name: username,
-                email: '', // Not used anymore
-                role_id: 1,
-                firstname: 'Technician',
-                lastname: 'User',
-                titlename: 'Mr.',
+                id: data.user?.id || 1, // Use data.user if available, otherwise placeholder
+                name: data.user?.name || username,
+                email: data.user?.email || '',
+                role_id: data.user?.role_id || data.role_id || 1,
+                firstname: data.user?.firstname || 'Technician',
+                lastname: data.user?.lastname || 'User',
+                titlename: data.user?.titlename || 'Mr.',
                 token: data.access_token
             }
         };
@@ -118,6 +131,13 @@ export const api = {
             return data;
         } catch (error) {
             console.warn('Failed to fetch history:', error);
+            // If session expired, handleResponse would have thrown and redirected. 
+            // If we catch it here, we might swallow the redirection if logic continues? 
+            // handleResponse throws ERROR.
+            // But we should propagate the error if it's session expired so the UI knows or just let the redirect happen.
+            if (error instanceof Error && error.message === 'Session expired') {
+                throw error;
+            }
             return { data: [], meta: { total: 0, page: 1, limit: limit, totalPages: 1 } };
         }
     },
