@@ -76,7 +76,7 @@ const BoardControl = () => {
         const topic = `vehicle/${boardId()}/wrstatus`;
         const payload = JSON.stringify({
             model: 2,
-            status: isOpen ? 1 : 0,
+            status: isOpen ? 4 : 0,
         });
 
         client()?.publish(topic, payload, { qos: 0 }, (error) => {
@@ -108,8 +108,8 @@ const BoardControl = () => {
                     <button
                         onClick={connect}
                         class={`px-6 py-2 rounded-lg font-medium transition-all ${connectionStatus() === 'Connected'
-                                ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200'
+                            ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                            : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200'
                             }`}
                     >
                         {connectionStatus() === 'Connected' ? 'Disconnect' : 'Connect'}
@@ -117,7 +117,7 @@ const BoardControl = () => {
                 </div>
                 <div class="mt-2 text-sm">
                     Status: <span class={`font-medium ${connectionStatus() === 'Connected' ? 'text-green-600' :
-                            connectionStatus() === 'Disconnected' ? 'text-slate-500' : 'text-amber-600'
+                        connectionStatus() === 'Disconnected' ? 'text-slate-500' : 'text-amber-600'
                         }`}>{connectionStatus()}</span>
                 </div>
             </div>
@@ -169,7 +169,7 @@ const BoardControl = () => {
                         {(item) => (
                             <div class="flex items-start gap-4 p-4 rounded-lg bg-slate-50 border border-slate-100">
                                 <div class={`mt-1 w-2 h-2 rounded-full ${item.status === 'sent' ? 'bg-blue-500' :
-                                        item.status === 'received' ? 'bg-green-500' : 'bg-red-500'
+                                    item.status === 'received' ? 'bg-green-500' : 'bg-red-500'
                                     }`} />
                                 <div class="flex-1 min-w-0">
                                     <div class="flex justify-between items-start mb-1">
