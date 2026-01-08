@@ -3,7 +3,7 @@ import type { Vehicle, HistoryLog, AuthResponse, PaginatedResponse, User } from 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 // Liftngo API URL for cookie-based authentication
-const LIFTNGO_API_URL = import.meta.env.VITE_LIFTNGO_API_URL || 'http://liftngo.tmh-wst.com';
+const LIFTNGO_API_URL = import.meta.env.VITE_LIFTNGO_API_URL || 'https://liftngo.tmh-wst.com';
 
 // Cookie helper functions - exported for use in other components
 export const getCookie = (name: string): string | null => {
