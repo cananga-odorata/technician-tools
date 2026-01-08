@@ -1,6 +1,6 @@
 import { createSignal, onMount } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
-import { api, setCookie, getCookie } from '../services/api';
+import { api, setCookie, getCookie, LIFTNGO_URL } from '../services/api';
 import { t } from '../i18n/config';
 import LanguageSelector from '../components/LanguageSelector';
 
@@ -19,15 +19,20 @@ const Login = () => {
         // Only redirect if we have a valid LOCAL JWT (starts with eyJ), not a Liftngo token
         // Liftngo tokens (like 269|xxx) need to be exchanged first via AuthGuard
         const isLocalJwt = existingToken && existingToken.startsWith('eyJ');
+        const isLiftngoToken = existingToken && /^\d+\|/.test(existingToken);
 
         if (isLocalJwt) {
             // Already have local JWT - authenticated, redirect to dashboard
             console.log('Login page: Local JWT found, redirecting to dashboard');
             window.location.replace('/');
-        } else if (existingToken && /^\d+\|/.test(existingToken)) {
-            // This is a Liftngo token - let AuthGuard handle the exchange
-            // Don't redirect here to avoid loop, just let user manually go to dashboard or stay on login
-            console.log('Login page: Liftngo token found, user can proceed to dashboard for SSO exchange');
+        } else if (isLiftngoToken) {
+            // This is a Liftngo token - redirect to dashboard for SSO exchange
+            console.log('Login page: Liftngo token found, redirecting to dashboard for SSO exchange');
+            window.location.replace('/');
+        } else {
+            // No valid token - redirect to main Liftngo login page
+            console.log('Login page: No token found, redirecting to Liftngo login');
+            window.location.replace(`${LIFTNGO_URL}/login`);
         }
     });
 
