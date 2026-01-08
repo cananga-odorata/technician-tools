@@ -11,14 +11,23 @@ const Login = () => {
     const [loading, setLoading] = createSignal(false);
     const navigate = useNavigate();
 
-    // Check if already logged in via tsm cookie on mount
+    // Check if already logged in via local JWT token on mount
     onMount(() => {
         const existingToken = getCookie('tsm');
-        console.log('Login page: checking tsm cookie:', existingToken);
-        if (existingToken && existingToken !== 'undefined' && existingToken !== 'null') {
-            // Already authenticated, redirect to dashboard immediately
-            console.log('Login page: tsm cookie found, redirecting to dashboard');
+        console.log('Login page: checking tsm cookie:', existingToken ? existingToken.substring(0, 20) + '...' : 'null');
+
+        // Only redirect if we have a valid LOCAL JWT (starts with eyJ), not a Liftngo token
+        // Liftngo tokens (like 269|xxx) need to be exchanged first via AuthGuard
+        const isLocalJwt = existingToken && existingToken.startsWith('eyJ');
+
+        if (isLocalJwt) {
+            // Already have local JWT - authenticated, redirect to dashboard
+            console.log('Login page: Local JWT found, redirecting to dashboard');
             window.location.replace('/');
+        } else if (existingToken && /^\d+\|/.test(existingToken)) {
+            // This is a Liftngo token - let AuthGuard handle the exchange
+            // Don't redirect here to avoid loop, just let user manually go to dashboard or stay on login
+            console.log('Login page: Liftngo token found, user can proceed to dashboard for SSO exchange');
         }
     });
 
