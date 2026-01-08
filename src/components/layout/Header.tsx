@@ -27,12 +27,12 @@ export default function Header() {
             setUserProfile(null);
             setIsProfileOpen(false);
 
-            // Redirect to main Liftngo domain
-            window.location.href = LIFTNGO_URL;
+            // Redirect to main Liftngo login page
+            window.location.href = `${LIFTNGO_URL}/login`;
         } catch (error) {
             console.error('Logout failed:', error);
             // Still redirect even if API call fails
-            window.location.href = LIFTNGO_URL;
+            window.location.href = `${LIFTNGO_URL}/login`;
         }
     };
 
