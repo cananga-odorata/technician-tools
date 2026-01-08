@@ -2,22 +2,38 @@ import { A } from "@solidjs/router";
 import { createSignal, onMount } from "solid-js";
 // import DarkModeToggle from "../DarkModeToggle";
 import connectusIcon from '/public/connectedSocial-icon-notextbg.png';
+import { api, removeCookie, LIFTNGO_URL } from '../../services/api';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = createSignal(false);
     const [isProfileOpen, setIsProfileOpen] = createSignal(false);
     const [userProfile, setUserProfile] = createSignal<string | null>(null);
 
-    const handleLogout = (e: Event) => {
+    const handleLogout = async (e: Event) => {
         e.preventDefault();
-        localStorage.removeItem('user_profile');
-        // Clear any other auth-related items
-        localStorage.clear();
-        // Reset state
-        setUserProfile(null);
-        setIsProfileOpen(false);
-        // Redirect to login page
-        window.location.href = '/login';
+        try {
+            // Call logout API to invalidate session on server
+            await api.logout();
+
+            // Clear local storage
+            localStorage.removeItem('user_profile');
+            localStorage.removeItem('user');
+            localStorage.clear();
+
+            // Clear cookies
+            removeCookie('tsm');
+
+            // Reset state
+            setUserProfile(null);
+            setIsProfileOpen(false);
+
+            // Redirect to main Liftngo domain
+            window.location.href = LIFTNGO_URL;
+        } catch (error) {
+            console.error('Logout failed:', error);
+            // Still redirect even if API call fails
+            window.location.href = LIFTNGO_URL;
+        }
     };
 
     onMount(() => {
