@@ -16,6 +16,8 @@ const AuthGuard: Component<{ children: any }> = (props) => {
     // First, check if we have a valid local JWT token
     const existingToken = getCookie("tsm");
 
+    console.log("AuthGuard: Checking authentication, tsm cookie:", existingToken ? "found" : "not readable (may be HttpOnly)");
+
     // Check if token looks like a JWT (starts with eyJ) vs Liftngo token (starts with number|)
     const isLocalJwt = existingToken && existingToken.startsWith("eyJ");
     const isLiftngoToken = existingToken && /^\d+\|/.test(existingToken);
@@ -54,13 +56,30 @@ const AuthGuard: Component<{ children: any }> = (props) => {
       }
       setIsLoading(false);
       return;
-    } else {
-      // No valid token format - redirect to login page (not liftngo)
-      console.log("AuthGuard: No valid token found, redirecting to login page...");
-      setIsAuthenticated(false);
-      setIsLoading(false);
-      return;
     }
+
+    // No readable token - try cookie-based authentication (for HttpOnly cookies)
+    // The cookie will be sent with the request even if we can't read it via JavaScript
+    console.log("AuthGuard: No readable token, trying cookie-based authentication...");
+    try {
+      const cookieAuthResult = await api.loginWithCookie();
+
+      if (cookieAuthResult && cookieAuthResult.user) {
+        // Cookie auth successful - store user info
+        localStorage.setItem("user", JSON.stringify(cookieAuthResult.user));
+        console.log("AuthGuard: Cookie-based authentication successful");
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        return;
+      }
+    } catch (error) {
+      console.warn("AuthGuard: Cookie-based authentication failed:", error);
+    }
+
+    // All authentication methods failed - redirect to login page
+    console.log("AuthGuard: All authentication methods failed, redirecting to login page...");
+    setIsAuthenticated(false);
+    setIsLoading(false);
   });
 
   return (
