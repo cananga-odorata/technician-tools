@@ -69,10 +69,9 @@ const Dashboard = () => {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
+    const handleLogout = async () => {
+        await api.logout();
+        navigate('/login', { replace: true });
     };
 
     const tourSteps: TourStep[] = [
