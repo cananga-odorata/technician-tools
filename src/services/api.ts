@@ -1,11 +1,38 @@
-import type { Vehicle, HistoryLog, AuthResponse, PaginatedResponse } from '../types';
+import type { Vehicle, HistoryLog, AuthResponse, PaginatedResponse, User } from '../types';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+// Liftngo API URL for cookie-based authentication
+const LIFTNGO_API_URL = import.meta.env.VITE_LIFTNGO_API_URL || 'http://liftngo.tmh-wst.com';
+
+// Cookie helper functions - exported for use in other components
+export const getCookie = (name: string): string | null => {
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+        const [cookieName, cookieValue] = cookie.trim().split('=');
+        if (cookieName === name) {
+            return decodeURIComponent(cookieValue);
+        }
+    }
+    return null;
+};
+
+export const setCookie = (name: string, value: string, days: number = 7): void => {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    // Use SameSite=Lax for subdomain compatibility, Secure for HTTPS
+    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/${secure}; SameSite=Lax`;
+};
+
+export const removeCookie = (name: string): void => {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+};
+
 const getHeaders = () => {
-    const token = localStorage.getItem('token');
+    const token = getCookie('tsm');
     // Ensure we don't send "undefined" or "null" strings as tokens
-    const validToken = token && token !== 'undefined' && token !== 'null';
+    const validToken = token && token !== 'undefined' && token !== 'null' && token !== 'cookie-auth';
     return {
         'Content-Type': 'application/json',
         ...(validToken ? { Authorization: `Bearer ${token}` } : {}),
@@ -16,7 +43,7 @@ const handleResponse = async (response: Response) => {
     if (response.status === 401) {
         // Session expired or invalid token
         console.warn('Session expired or unauthorized, redirecting to login...');
-        localStorage.removeItem('token');
+        removeCookie('tsm');
         localStorage.removeItem('user');
 
         // Use replace to prevent back-button looping
@@ -154,6 +181,122 @@ export const api = {
             }).then(handleResponse);
         } catch (error) {
             console.error('Failed to log action', error);
+        }
+    },
+
+    // SSO Login with Liftngo token
+    // Sends the tsm token to backend, which validates with Liftngo API
+    // and returns a local JWT for subsequent API calls
+    ssoLogin: async (liftngoToken: string): Promise<AuthResponse> => {
+        const response = await fetch(`${BASE_URL}/auth/sso/liftngo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: liftngoToken }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'SSO login failed');
+        }
+
+        const data = await response.json();
+
+        if (!data.access_token) {
+            throw new Error('Invalid server response: No access token received');
+        }
+
+        return {
+            token: data.access_token,
+            user: {
+                id: data.user?.id || 0,
+                name: data.user?.name || '',
+                email: data.user?.email || '',
+                role_id: data.user?.role_id || 1,
+                firstname: data.user?.firstname || '',
+                lastname: data.user?.lastname || '',
+                titlename: data.user?.titlename || '',
+            }
+        };
+    },
+
+    // Legacy: Cookie-based authentication using tsm cookie from parent domain (liftngo)
+    // Note: This is deprecated, use ssoLogin instead
+    loginWithCookie: async (): Promise<AuthResponse | null> => {
+        try {
+            const response = await fetch(`${LIFTNGO_API_URL}/api/tech/profile`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                credentials: 'include', // Important: This sends cookies with the request
+            });
+
+            if (!response.ok) {
+                console.warn('Cookie authentication failed:', response.status);
+                return null;
+            }
+
+            const data = await response.json();
+
+            // API returns { user: { ... } } format
+            const userData = data.user;
+
+            if (!userData) {
+                console.warn('Cookie authentication failed: No user data in response');
+                return null;
+            }
+
+            // Map the API response to our User format
+            const user: User = {
+                id: userData.id,
+                name: userData.name || '',
+                email: userData.email || '',
+                role_id: userData.role_id || 1,
+                firstname: userData.firstname || '',
+                lastname: userData.lastname || '',
+                titlename: userData.titlename || '',
+            };
+
+            // For cookie-based auth, we don't get a separate token
+            // We'll use a special marker to indicate cookie-based session
+            return {
+                token: 'cookie-auth', // Marker to indicate cookie-based authentication
+                user: user,
+            };
+        } catch (error) {
+            console.warn('Cookie authentication error:', error);
+            return null;
+        }
+    },
+
+    // Check if tsm cookie exists (basic check)
+    hasTsmCookie: (): boolean => {
+        // Note: We can only check cookies that are not HttpOnly
+        // If tsm is HttpOnly, this check won't work and we'll need to try the API call
+        const cookies = document.cookie.split(';');
+        return cookies.some(cookie => cookie.trim().startsWith('tsm='));
+    },
+
+    // Logout function - calls API and removes local session
+    logout: async (): Promise<void> => {
+        try {
+            const token = getCookie('tsm');
+            if (token && token !== 'undefined' && token !== 'null' && token !== 'cookie-auth') {
+                // Call the logout API
+                await fetch(`${LIFTNGO_API_URL}/api/tech/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+            }
+        } catch (error) {
+            console.warn('Logout API call failed:', error);
+        } finally {
+            // Always remove local session data regardless of API call result
+            removeCookie('tsm');
+            localStorage.removeItem('user');
         }
     }
 };
