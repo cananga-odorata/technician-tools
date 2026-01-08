@@ -1,6 +1,6 @@
-import { createSignal } from 'solid-js';
+import { createSignal, onMount } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
-import { api } from '../services/api';
+import { api, setCookie, getCookie } from '../services/api';
 import { t } from '../i18n/config';
 import LanguageSelector from '../components/LanguageSelector';
 
@@ -11,6 +11,17 @@ const Login = () => {
     const [loading, setLoading] = createSignal(false);
     const navigate = useNavigate();
 
+    // Check if already logged in via tsm cookie on mount
+    onMount(() => {
+        const existingToken = getCookie('tsm');
+        console.log('Login page: checking tsm cookie:', existingToken);
+        if (existingToken && existingToken !== 'undefined' && existingToken !== 'null') {
+            // Already authenticated, redirect to dashboard immediately
+            console.log('Login page: tsm cookie found, redirecting to dashboard');
+            window.location.replace('/');
+        }
+    });
+
     const handleLogin = async (e: Event) => {
         e.preventDefault();
         setLoading(true);
@@ -18,7 +29,8 @@ const Login = () => {
 
         try {
             const response = await api.login(username(), password());
-            localStorage.setItem('token', response.token);
+            // Store auth data in cookies instead of localStorage
+            setCookie('tsm', response.token);
             localStorage.setItem('user', JSON.stringify(response.user));
             navigate('/');
         } catch (err) {
@@ -79,6 +91,35 @@ const Login = () => {
                         {loading() ? t("signing_in") : t("sign_in")}
                     </button>
                 </form>
+
+                {/* Dev mode helper - only show on localhost */}
+                {window.location.hostname === 'localhost' && (
+                    <div class="mt-6 pt-6 border-t border-border-secondary">
+                        <p class="text-xs text-text-tertiary mb-3 text-center">🔧 Dev Mode: Paste your tsm token to test</p>
+                        <div class="flex gap-2">
+                            <input
+                                type="text"
+                                id="dev-token-input"
+                                placeholder="Paste tsm token here..."
+                                class="flex-1 px-3 py-2 rounded-lg border border-border-primary bg-tertiary text-text-primary text-xs focus:border-accent outline-none"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const input = document.getElementById('dev-token-input') as HTMLInputElement;
+                                    if (input?.value) {
+                                        setCookie('tsm', input.value);
+                                        console.log('Dev: tsm cookie set!');
+                                        window.location.replace('/');
+                                    }
+                                }}
+                                class="px-4 py-2 bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/30 rounded-lg text-xs font-medium transition-colors"
+                            >
+                                Set & Go
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
