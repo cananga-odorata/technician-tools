@@ -43,21 +43,22 @@ const AuthGuard: Component<{ children: any }> = (props) => {
           console.log("AuthGuard: SSO login successful");
           setIsAuthenticated(true);
         } else {
-          console.warn("AuthGuard: SSO login returned no result");
+          console.warn("AuthGuard: SSO login returned no result, redirect to login page");
           setIsAuthenticated(false);
         }
       } catch (error) {
         console.warn("AuthGuard: SSO login failed:", error);
-        // Remove invalid token
+        // Remove invalid token and redirect to login page
         removeCookie("tsm");
         setIsAuthenticated(false);
       }
       setIsLoading(false);
       return;
     } else {
-      // No token at all - not authenticated
-      console.log("AuthGuard: No valid token found, redirecting to login...");
-      window.location.replace("https://liftngo.tmh-wst.com/");
+      // No valid token format - redirect to login page (not liftngo)
+      console.log("AuthGuard: No valid token found, redirecting to login page...");
+      setIsAuthenticated(false);
+      setIsLoading(false);
       return;
     }
   });
@@ -74,7 +75,8 @@ const AuthGuard: Component<{ children: any }> = (props) => {
       <Show
         when={isAuthenticated()}
         fallback={(() => {
-          window.location.replace("https://liftngo.tmh-wst.com/");
+          // Redirect to technician login page instead of liftngo
+          window.location.replace("/login");
           return null;
         })()}
       >
