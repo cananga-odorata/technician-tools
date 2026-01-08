@@ -22,11 +22,18 @@ export const setCookie = (name: string, value: string, days: number = 7): void =
     expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
     // Use SameSite=Lax for subdomain compatibility, Secure for HTTPS
     const secure = window.location.protocol === 'https:' ? '; Secure' : '';
-    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/${secure}; SameSite=Lax`;
+    // Use parent domain .tmh-wst.com to override Liftngo's tsm cookie
+    const domain = window.location.hostname.includes('tmh-wst.com') ? '; domain=.tmh-wst.com' : '';
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/${secure}${domain}; SameSite=Lax`;
 };
 
 export const removeCookie = (name: string): void => {
+    // Remove from both current domain and parent domain
     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+    // Also try to remove from parent domain
+    if (window.location.hostname.includes('tmh-wst.com')) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.tmh-wst.com`;
+    }
 };
 
 const getHeaders = () => {
@@ -42,11 +49,25 @@ const getHeaders = () => {
 const handleResponse = async (response: Response) => {
     if (response.status === 401) {
         // Session expired or invalid token
-        console.warn('Session expired or unauthorized, redirecting to login...');
+        // Don't auto-redirect here - it causes loops when combined with SSO
+        // Instead, throw an error and let the caller/component handle it
+        console.warn('API returned 401 Unauthorized - token may be invalid');
+
+        // Only remove cookie and redirect if we're NOT in an SSO flow
+        // Check if this looks like a fresh SSO attempt
+        const currentToken = getCookie('tsm');
+        const isLiftngoToken = currentToken && /^\d+\|/.test(currentToken);
+
+        if (isLiftngoToken) {
+            // This is still a Liftngo token - SSO might have failed silently
+            console.warn('Still have Liftngo token after 401 - SSO may need retry');
+            throw new Error('SSO token not valid for API');
+        }
+
+        // Only redirect if we had a JWT (not Liftngo token) and it expired
+        console.warn('Session expired, clearing token and redirecting to login...');
         removeCookie('tsm');
         localStorage.removeItem('user');
-
-        // Use replace to prevent back-button looping
         window.location.replace('/login');
 
         // Throwing error to interrupt the promise chain
