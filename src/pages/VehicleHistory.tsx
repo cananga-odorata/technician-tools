@@ -23,10 +23,9 @@ const VehicleHistory = () => {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
+    const handleLogout = async () => {
+        await api.logout();
+        navigate('/login', { replace: true });
     };
 
     // Default date range: if searching by serial, use 30 days; otherwise 24 hours
@@ -54,9 +53,9 @@ const VehicleHistory = () => {
             const startISO = new Date(start).toISOString();
             const endISO = new Date(end).toISOString();
 
-            console.log('Fetching history:', { page, startISO, endISO, search });
+            // console.log('Fetching history:', { page, startISO, endISO, search });
             const result = await api.getHistory(page, 5, startISO, endISO, search);
-            console.log('History result:', result);
+            // console.log('History result:', result);
             return result;
         }
     );
