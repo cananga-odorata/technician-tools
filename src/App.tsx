@@ -37,9 +37,11 @@ const AuthGuard: Component<{ children: any }> = (props) => {
         const ssoResult = await api.ssoLogin(existingToken);
 
         if (ssoResult) {
-          // SSO successful - store local JWT
+          // SSO successful - store local JWT and keep Liftngo token for logout
           setCookie("tsm", ssoResult.token);
           localStorage.setItem("user", JSON.stringify(ssoResult.user));
+          // Save Liftngo token for logout API call later
+          localStorage.setItem("liftngo_token", existingToken);
           console.log("AuthGuard: SSO login successful");
           setIsAuthenticated(true);
         } else {

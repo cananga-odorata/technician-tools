@@ -305,16 +305,27 @@ export const api = {
     // Logout function - calls API and removes local session
     logout: async (): Promise<void> => {
         try {
-            const token = getCookie('tsm');
-            if (token && token !== 'undefined' && token !== 'null' && token !== 'cookie-auth') {
-                // Call the logout API
+            // Use the original Liftngo token (saved during SSO) for logout API
+            const liftngoToken = localStorage.getItem('liftngo_token');
+            const currentToken = getCookie('tsm');
+
+            // Prefer Liftngo token, fallback to current token if it looks like a Liftngo token
+            const tokenForLogout = liftngoToken || (currentToken && /^\d+\|/.test(currentToken) ? currentToken : null);
+
+            if (tokenForLogout) {
+                console.log('Calling Liftngo logout API...');
+                // Call the logout API with cookies
                 await fetch(`${LIFTNGO_API_URL}/api/tech/logout`, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': `Bearer ${tokenForLogout}`,
                     },
+                    credentials: 'include', // Send cookies (liftngo_session) with the request
                 });
+                console.log('Liftngo logout API called successfully');
+            } else {
+                console.warn('No valid Liftngo token found for logout API');
             }
         } catch (error) {
             console.warn('Logout API call failed:', error);
@@ -322,6 +333,7 @@ export const api = {
             // Always remove local session data regardless of API call result
             removeCookie('tsm');
             localStorage.removeItem('user');
+            localStorage.removeItem('liftngo_token');
         }
     }
 };
