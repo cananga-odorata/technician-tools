@@ -2,7 +2,8 @@ import { A } from "@solidjs/router";
 import { createSignal, onMount } from "solid-js";
 // import DarkModeToggle from "../DarkModeToggle";
 import connectusIcon from "/public/connectedSocial-icon-notextbg.png";
-import { api, removeCookie, LIFTNGO_URL } from "../../services/api";
+
+const LIFTNGO_URL = "https://liftngo.example.com";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = createSignal(false);

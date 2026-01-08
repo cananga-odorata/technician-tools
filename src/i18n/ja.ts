@@ -7,7 +7,7 @@ export const dict = {
   technician_tools: "技術者ツール",
   login: "ログイン",
   logout: "ログアウト",
-  comback: "戻る",
+  comeback: "戻る",
   dark_mode: "ダークモード",
   light_mode: "ライトモード",
   technician_dashboard: "技術者ダッシュボード",

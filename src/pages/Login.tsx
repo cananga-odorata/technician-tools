@@ -1,6 +1,6 @@
 import { createSignal, onMount } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { api, setCookie, getCookie, LIFTNGO_URL } from "../services/api";
+import { api, setCookie, getCookie } from "../services/api";
 import { t } from "../i18n/config";
 import LanguageSelector from "../components/LanguageSelector";
 

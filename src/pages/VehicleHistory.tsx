@@ -34,11 +34,6 @@ const VehicleHistory = () => {
     window.location.href = `${LIFTNGO_URL}/dashboard`;
   };
 
-  const handleLogout = async () => {
-    await api.logout();
-    navigate("/login", { replace: true });
-  };
-
   // Default date range: if searching by serial, use 30 days; otherwise 24 hours
   const getDefaultDates = () => {
     const now = new Date();
