@@ -4,7 +4,7 @@ import { Router, Route } from "@solidjs/router";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import VehicleHistory from "./pages/VehicleHistory";
-import { api, getCookie, setCookie, removeCookie } from "./services/api";
+import { api, getCookie, setCookie } from "./services/api";
 
 const AuthGuard: Component<{ children: any }> = (props) => {
   const [isAuthenticated, setIsAuthenticated] = createSignal<boolean | null>(
@@ -91,8 +91,7 @@ const AuthGuard: Component<{ children: any }> = (props) => {
         }
       } catch (error: any) {
         console.warn("AuthGuard: SSO login failed:", error?.message || error);
-        // Remove invalid token
-        removeCookie("tsm");
+        // Don't remove cookies from parent domain - they belong to Liftngo
         setIsAuthenticated(false);
       }
       setIsLoading(false);
@@ -131,9 +130,7 @@ const AuthGuard: Component<{ children: any }> = (props) => {
         }
       } catch (error: any) {
         console.warn("AuthGuard: Cookie SSO login failed:", error?.message || error);
-        // Remove invalid cookies
-        removeCookie("tsm");
-        removeCookie("liftngo_session");
+        // Don't remove cookies from parent domain - they belong to Liftngo
         setIsAuthenticated(false);
       }
       setIsLoading(false);

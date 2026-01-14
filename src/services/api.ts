@@ -68,9 +68,9 @@ const handleResponse = async (response: Response) => {
             throw new Error('SSO token not valid for API');
         }
 
-        // Only redirect if we had a JWT (not Liftngo token) and it expired
-        console.warn('Session expired, clearing token and redirecting to login...');
-        removeCookie('tsm');
+        // Session expired - redirect to login without removing parent domain cookies
+        console.warn('Session expired, redirecting to login...');
+        // Note: Don't removeCookie here - cookies belong to Liftngo parent domain
         localStorage.removeItem('user');
         window.location.replace('/login');
 
