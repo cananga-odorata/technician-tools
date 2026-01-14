@@ -18,9 +18,41 @@ const AuthGuard: Component<{ children: any }> = (props) => {
 
     console.log("AuthGuard: tsm cookie:", existingToken ? `found (${existingToken.substring(0, 20)}...)` : "NULL");
 
-    // Check if token looks like a JWT (starts with eyJ) vs Liftngo token (starts with number|)
-    const isLocalJwt = existingToken && existingToken.startsWith("eyJ");
+    // Helper function to detect if token is a valid JWT
+    const isValidJWT = (token: string): boolean => {
+      // JWT must have exactly 3 parts separated by dots
+      const parts = token.split('.');
+      if (parts.length !== 3) return false;
+
+      // Try to decode the first part (header)
+      try {
+        const decoded = atob(parts[0]);
+        const parsed = JSON.parse(decoded);
+        // JWT header should have 'alg' and 'typ' fields
+        return parsed.alg && parsed.typ;
+      } catch {
+        return false;
+      }
+    };
+
+    // Helper function to detect Laravel encrypted cookie
+    const isLaravelEncryptedCookie = (token: string): boolean => {
+      try {
+        // Try URL decode first
+        const decoded = decodeURIComponent(token);
+        // Try to parse as JSON
+        const parsed = JSON.parse(atob(decoded));
+        // Laravel encrypted cookie has 'iv', 'value', 'mac' fields
+        return parsed.iv && parsed.value && parsed.mac;
+      } catch {
+        return false;
+      }
+    };
+
+    // Check token type
+    const isLocalJwt = existingToken && isValidJWT(existingToken);
     const isLiftngoToken = existingToken && /^\d+\|/.test(existingToken);
+    const isEncryptedCookie = existingToken && isLaravelEncryptedCookie(existingToken);
 
     if (isLocalJwt) {
       // Already have local JWT - authenticated
@@ -58,8 +90,50 @@ const AuthGuard: Component<{ children: any }> = (props) => {
       return;
     }
 
+    if (isEncryptedCookie) {
+      // Have Laravel encrypted session cookie - need liftngo_session too
+      console.log("AuthGuard: Found Laravel encrypted cookie, exchanging via backend...");
+
+      // Get liftngo_session cookie too (required by Liftngo API)
+      const liftngoSession = getCookie("liftngo_session");
+
+      if (!liftngoSession) {
+        console.warn("AuthGuard: Missing liftngo_session cookie");
+        setIsAuthenticated(false);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const ssoResult = await api.ssoCookieLogin(existingToken, liftngoSession);
+
+        if (ssoResult) {
+          // Cookie SSO successful - store local JWT
+          setCookie("tsm", ssoResult.token);
+          localStorage.setItem("user", JSON.stringify(ssoResult.user));
+          // Save encrypted cookies for potential logout later
+          localStorage.setItem("liftngo_tsm", existingToken);
+          localStorage.setItem("liftngo_session", liftngoSession);
+          console.log("AuthGuard: Cookie SSO login successful");
+          setIsAuthenticated(true);
+        } else {
+          console.warn("AuthGuard: Cookie SSO login returned no result");
+          setIsAuthenticated(false);
+        }
+      } catch (error: any) {
+        console.warn("AuthGuard: Cookie SSO login failed:", error?.message || error);
+        // Remove invalid cookies
+        removeCookie("tsm");
+        removeCookie("liftngo_session");
+        setIsAuthenticated(false);
+      }
+      setIsLoading(false);
+      return;
+    }
+
     // No readable token - try cookie-based authentication (for HttpOnly cookies)
     console.log("AuthGuard: No readable token, trying cookie-based auth...");
+
     try {
       const cookieAuthResult = await api.loginWithCookie();
 
