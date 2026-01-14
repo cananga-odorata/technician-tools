@@ -1,13 +1,112 @@
 import type { Vehicle, HistoryLog, AuthResponse, PaginatedResponse } from '../types';
+import { getCookie } from '../utils/cookies';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+/**
+ * Legacy header getter - kept for backward compatibility
+ * @deprecated Use authenticatedRequest() for automatic fallback
+ */
 const getHeaders = () => {
     const token = localStorage.getItem('token');
     return {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
+};
+
+/**
+ * Helper: Fetch with JWT Token
+ */
+const fetchWithToken = async (url: string, token: string, options: RequestInit = {}): Promise<Response> => {
+    console.log('[Auth] Attempting request with JWT token');
+    return fetch(url, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+            Authorization: `Bearer ${token}`,
+        },
+    });
+};
+
+/**
+ * Helper: Fetch with Cookie Authentication
+ */
+const fetchWithCookie = async (url: string, options: RequestInit = {}): Promise<Response> => {
+    console.log('[Auth] Attempting request with cookie authentication');
+    return fetch(url, {
+        ...options,
+        credentials: 'include', // Send cookies automatically
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+        },
+    });
+};
+
+/**
+ * Hybrid Authenticated Request with automatic fallback
+ * Strategy:
+ * 1. Try JWT if available (fast, local validation)
+ * 2. If JWT fails (401), try Cookie auth (Laravel session)
+ * 3. If both fail, redirect to login
+ */
+const authenticatedRequest = async (url: string, options: RequestInit = {}): Promise<Response> => {
+    const token = localStorage.getItem('token');
+    const tsmCookie = getCookie('tsm');
+
+    // Strategy 1: Try JWT if available
+    if (token) {
+        try {
+            const response = await fetchWithToken(url, token, options);
+
+            if (response.ok) {
+                console.log('[Auth] ✅ JWT authentication successful');
+                return response;
+            }
+
+            if (response.status === 401) {
+                console.warn('[Auth] ⚠️ JWT invalid or expired, trying cookie fallback...');
+                localStorage.removeItem('token'); // Clear invalid JWT
+                // Fall through to Strategy 2
+            } else {
+                // Other errors (500, 404, etc.) - don't fallback
+                return response;
+            }
+        } catch (err) {
+            console.error('[Auth] JWT request failed:', err);
+            // Network error, try fallback
+        }
+    }
+
+    // Strategy 2: Try Cookie if JWT failed or not available
+    if (tsmCookie) {
+        try {
+            const response = await fetchWithCookie(url, options);
+
+            if (response.ok) {
+                console.log('[Auth] ✅ Cookie authentication successful');
+                return response;
+            }
+
+            if (response.status === 401) {
+                console.warn('[Auth] ❌ Cookie invalid, redirecting to login...');
+                window.location.href = '/login';
+                throw new Error('Authentication failed');
+            }
+
+            return response;
+        } catch (err) {
+            console.error('[Auth] Cookie request failed:', err);
+            throw err;
+        }
+    }
+
+    // No authentication available
+    console.error('[Auth] ❌ No authentication available');
+    window.location.href = '/login';
+    throw new Error('No authentication available');
 };
 
 export const api = {
@@ -104,10 +203,8 @@ export const api = {
     },
 
     getVehicles: async (page = 1, limit = 8, search = ''): Promise<PaginatedResponse<Vehicle>> => {
-        // Use the endpoint provided by the user
-        const response = await fetch(`${BASE_URL}/technician/fleet-boxes?page=${page}&limit=${limit}&search=${search}`, {
-            headers: getHeaders(),
-        });
+        const url = `${BASE_URL}/technician/fleet-boxes?page=${page}&limit=${limit}&search=${search}`;
+        const response = await authenticatedRequest(url);
 
         if (!response.ok) {
             throw new Error('Failed to fetch dashboard data');
@@ -154,11 +251,7 @@ export const api = {
         if (search) params.append('search', search);
 
         const url = `${BASE_URL}/technician/history?${params.toString()}`;
-        // console.log('Fetching history from:', url);
-
-        const response = await fetch(url, {
-            headers: getHeaders(),
-        });
+        const response = await authenticatedRequest(url);
 
         if (!response.ok) {
             console.warn('Failed to fetch history:', response.status, response.statusText);
@@ -166,14 +259,12 @@ export const api = {
         }
 
         const data = await response.json();
-        // console.log('History data:', data);
         return data;
     },
 
     logAction: async (action: string, details: string, fb_id?: number, fp_id?: number): Promise<void> => {
-        const response = await fetch(`${BASE_URL}/technician/log`, {
+        const response = await authenticatedRequest(`${BASE_URL}/technician/log`, {
             method: 'POST',
-            headers: getHeaders(),
             body: JSON.stringify({ action, details, fb_id, fp_id })
         });
 
