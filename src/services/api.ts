@@ -4,18 +4,6 @@ import { getCookie } from '../utils/cookies';
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 /**
- * Legacy header getter - kept for backward compatibility
- * @deprecated Use authenticatedRequest() for automatic fallback
- */
-const getHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    };
-};
-
-/**
  * Helper: Fetch with JWT Token
  */
 const fetchWithToken = async (url: string, token: string, options: RequestInit = {}): Promise<Response> => {
