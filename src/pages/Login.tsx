@@ -1,13 +1,58 @@
-import { createSignal } from 'solid-js';
+import { createSignal, onMount } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import { api } from '../services/api';
+import { getCookie, hasTsmCookie, getAllCookies } from '../utils/cookies';
+
+const LIFTNGO_LOGIN_URL = import.meta.env.VITE_LIFTNGO_URL || 'https://liftngo.tmh-wst.com';
 
 const Login = () => {
     const [username, setUsername] = createSignal('');
     const [password, setPassword] = createSignal('');
     const [error, setError] = createSignal('');
     const [loading, setLoading] = createSignal(false);
+    const [cookieCheckDone, setCookieCheckDone] = createSignal(false);
     const navigate = useNavigate();
+
+    onMount(async () => {
+        console.log('[Login] Checking for tsm cookie...');
+        console.log('[Login] All cookies:', getAllCookies());
+
+        const tsmCookie = getCookie('tsm');
+
+        if (tsmCookie) {
+            console.log('[Login] tsm cookie found:', tsmCookie.substring(0, 20) + '...');
+            setLoading(true);
+
+            try {
+                // Validate cookie with backend
+                const userData = await api.validateCookie();
+
+                if (userData && userData.user) {
+                    console.log('[Login] Cookie validation successful, redirecting to dashboard');
+                    // Store user data in localStorage for app use
+                    localStorage.setItem('user', JSON.stringify(userData.user));
+                    navigate('/');
+                    return;
+                }
+
+                console.warn('[Login] Cookie validation failed, will show login form');
+            } catch (err) {
+                console.error('[Login] Cookie validation error:', err);
+            } finally {
+                setLoading(false);
+            }
+        } else {
+            console.warn('[Login] No tsm cookie found');
+            console.log('[Login] Redirecting to Liftngo login page...');
+
+            // Redirect to main Liftngo login page
+            // User will login there, get the cookie, then navigate back here
+            window.location.href = `${LIFTNGO_LOGIN_URL}/login`;
+            return;
+        }
+
+        setCookieCheckDone(true);
+    });
 
     const handleLogin = async (e: Event) => {
         e.preventDefault();
@@ -26,6 +71,20 @@ const Login = () => {
         }
     };
 
+    // Show loading state while checking cookie
+    if (!cookieCheckDone()) {
+        return (
+            <div class="min-h-screen flex items-center justify-center bg-primary transition-colors duration-300">
+                <div class="bg-secondary p-8 rounded-2xl shadow-xl w-full max-w-md border border-border-primary">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+                        <p class="text-text-secondary">Checking authentication...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div class="min-h-screen flex items-center justify-center bg-primary transition-colors duration-300">
             <div class="bg-secondary p-8 rounded-2xl shadow-xl w-full max-w-md border border-border-primary">
@@ -33,6 +92,9 @@ const Login = () => {
                     <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-accent-text font-bold text-xl mx-auto mb-4 shadow-lg shadow-accent/20">T</div>
                     <h1 class="text-2xl font-bold text-text-primary">Technician Login</h1>
                     <p class="text-text-tertiary mt-2">Enter your credentials to access the system</p>
+                    <p class="text-text-tertiary text-xs mt-4">
+                        Or <a href={`${LIFTNGO_LOGIN_URL}/login`} class="text-accent hover:underline">login via Liftngo</a>
+                    </p>
                 </div>
 
                 <form onSubmit={handleLogin} class="space-y-6">
@@ -80,3 +142,4 @@ const Login = () => {
 };
 
 export default Login;
+

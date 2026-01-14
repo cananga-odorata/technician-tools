@@ -42,6 +42,35 @@ export const api = {
         };
     },
 
+    /**
+     * Validate tsm cookie with backend
+     * Returns user profile if cookie is valid
+     * Uses credentials: 'include' to send cookies across domains
+     */
+    validateCookie: async (): Promise<{ user: any } | null> => {
+        try {
+            const response = await fetch(`${BASE_URL}/auth/cookie/profile`, {
+                method: 'GET',
+                credentials: 'include', // Essential for sending cookies cross-domain
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                console.warn('[Cookie Auth] Validation failed:', response.status);
+                return null;
+            }
+
+            const data = await response.json();
+            console.log('[Cookie Auth] Validation successful:', data);
+            return data;
+        } catch (error) {
+            console.error('[Cookie Auth] Error:', error);
+            return null;
+        }
+    },
+
     getVehicles: async (page = 1, limit = 8, search = ''): Promise<PaginatedResponse<Vehicle>> => {
         // Use the endpoint provided by the user
         const response = await fetch(`${BASE_URL}/technician/fleet-boxes?page=${page}&limit=${limit}&search=${search}`, {
