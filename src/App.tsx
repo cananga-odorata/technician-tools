@@ -13,6 +13,11 @@ const AuthGuard: Component<{ children: any }> = (props) => {
   const [isLoading, setIsLoading] = createSignal(true);
 
   createEffect(async () => {
+    // Wait 3 seconds for cookies to be available from parent domain
+    console.log("AuthGuard: Waiting for cookies...");
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    console.log("AuthGuard: Done waiting, checking cookies now...");
+
     // First, check if we have a valid local JWT token
     const existingToken = getCookie("tsm");
 
@@ -53,6 +58,10 @@ const AuthGuard: Component<{ children: any }> = (props) => {
     const isLocalJwt = existingToken && isValidJWT(existingToken);
     const isLiftngoToken = existingToken && /^\d+\|/.test(existingToken);
     const isEncryptedCookie = existingToken && isLaravelEncryptedCookie(existingToken);
+
+    // Also log liftngo_session for debugging
+    const liftngoSession = getCookie("liftngo_session");
+    console.log("AuthGuard: liftngo_session cookie:", liftngoSession ? `found (${liftngoSession.substring(0, 20)}...)` : "NULL");
 
     if (isLocalJwt) {
       // Already have local JWT - authenticated
@@ -160,8 +169,10 @@ const AuthGuard: Component<{ children: any }> = (props) => {
     <Show
       when={!isLoading()}
       fallback={
-        <div class="min-h-screen flex items-center justify-center bg-primary">
-          <div class="text-text-primary">Loading...</div>
+        <div class="min-h-screen flex flex-col items-center justify-center bg-primary">
+          <div class="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4"></div>
+          <div class="text-text-primary text-lg">กำลังตรวจสอบสิทธิ์...</div>
+          <div class="text-text-tertiary text-sm mt-2">รอสักครู่</div>
         </div>
       }
     >
