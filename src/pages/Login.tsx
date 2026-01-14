@@ -20,24 +20,28 @@ const Login = () => {
         const tsmCookie = getCookie('tsm');
 
         if (tsmCookie) {
-            console.log('[Login] tsm cookie found:', tsmCookie.substring(0, 20) + '...');
+            console.log('[Login] tsm session cookie found, exchanging for JWT...');
             setLoading(true);
 
             try {
-                // Validate cookie with backend
-                const userData = await api.validateCookie();
+                // Exchange Laravel session for JWT
+                const jwtData = await api.exchangeSessionForJWT(tsmCookie);
 
-                if (userData && userData.user) {
-                    console.log('[Login] Cookie validation successful, redirecting to dashboard');
-                    // Store user data in localStorage for app use
-                    localStorage.setItem('user', JSON.stringify(userData.user));
+                if (jwtData && jwtData.access_token) {
+                    console.log('[Login] JWT exchange successful!');
+
+                    // Store JWT token and user data
+                    localStorage.setItem('token', jwtData.access_token);
+                    localStorage.setItem('user', JSON.stringify(jwtData.user));
+
+                    // Redirect to dashboard
                     navigate('/');
                     return;
                 }
 
-                console.warn('[Login] Cookie validation failed, will show login form');
+                console.warn('[Login] JWT exchange failed, redirecting to Liftngo');
             } catch (err) {
-                console.error('[Login] Cookie validation error:', err);
+                console.error('[Login] JWT exchange error:', err);
             } finally {
                 setLoading(false);
             }

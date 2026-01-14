@@ -71,6 +71,38 @@ export const api = {
         }
     },
 
+    /**
+     * Exchange Laravel session cookie for JWT
+     * Sends the tsm session cookie to backend, which validates with Laravel
+     * and returns a JWT token for technical portal use
+     */
+    exchangeSessionForJWT: async (sessionCookie: string): Promise<{ access_token: string; user: any } | null> => {
+        try {
+            console.log('[Session Exchange] Exchanging session cookie for JWT...');
+
+            const response = await fetch(`${BASE_URL}/auth/exchange-session`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ sessionCookie }),
+            });
+
+            if (!response.ok) {
+                console.warn('[Session Exchange] Exchange failed:', response.status);
+                return null;
+            }
+
+            const data = await response.json();
+            console.log('[Session Exchange] Exchange successful, JWT received');
+            return data;
+        } catch (error) {
+            console.error('[Session Exchange] Error:', error);
+            return null;
+        }
+    },
+
     getVehicles: async (page = 1, limit = 8, search = ''): Promise<PaginatedResponse<Vehicle>> => {
         // Use the endpoint provided by the user
         const response = await fetch(`${BASE_URL}/technician/fleet-boxes?page=${page}&limit=${limit}&search=${search}`, {
