@@ -1,7 +1,7 @@
 import { createSignal, onMount } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import { api } from '../services/api';
-import { getCookie, hasTsmCookie, getAllCookies } from '../utils/cookies';
+import { getCookie, getAllCookies } from '../utils/cookies';
 
 const LIFTNGO_LOGIN_URL = import.meta.env.VITE_LIFTNGO_URL || 'https://liftngo.tmh-wst.com';
 

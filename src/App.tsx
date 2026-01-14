@@ -5,8 +5,6 @@ import Dashboard from './pages/Dashboard';
 import VehicleHistory from './pages/VehicleHistory';
 import { getCookie, getAllCookies } from './utils/cookies';
 
-const LIFTNGO_LOGIN_URL = import.meta.env.VITE_LIFTNGO_URL || 'https://liftngo.tmh-wst.com';
-
 const AuthGuard: Component<{ children: any }> = (props) => {
   console.log('[AuthGuard] Checking authentication...');
   console.log('[AuthGuard] All cookies:', getAllCookies());
