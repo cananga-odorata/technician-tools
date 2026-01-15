@@ -4,7 +4,7 @@ import { Router, Route } from "@solidjs/router";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import VehicleHistory from "./pages/VehicleHistory";
-import { api, getCookie, setCookie } from "./services/api";
+import { api, getCookie, setCookie, removeCookie } from "./services/api";
 
 const AuthGuard: Component<{ children: any }> = (props) => {
   const [isAuthenticated, setIsAuthenticated] = createSignal<boolean | null>(
@@ -130,6 +130,20 @@ const AuthGuard: Component<{ children: any }> = (props) => {
         }
       } catch (error: any) {
         console.warn("AuthGuard: Cookie SSO login failed:", error?.message || error);
+
+        // If permission denied (403), stop redirect loop and show error
+        if (error.message && error.message.includes("permission")) {
+          console.error("AuthGuard: Permission denied, stopping redirect loop");
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          alert(`Login failed: ${error.message}`); // Simple alert for now, better UI later
+          // Clear cookies to allow relogin with different account
+          removeCookie("tsm");
+          removeCookie("liftngo_session");
+          window.location.replace("/login");
+          return;
+        }
+
         // Don't remove cookies from parent domain - they belong to Liftngo
         setIsAuthenticated(false);
       }
