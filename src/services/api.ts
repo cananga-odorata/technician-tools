@@ -68,9 +68,9 @@ const handleResponse = async (response: Response) => {
             throw new Error('SSO token not valid for API');
         }
 
-        // Only redirect if we had a JWT (not Liftngo token) and it expired
-        console.warn('Session expired, clearing token and redirecting to login...');
-        removeCookie('tsm');
+        // Session expired - redirect to login without removing parent domain cookies
+        console.warn('Session expired, redirecting to login...');
+        // Note: Don't removeCookie here - cookies belong to Liftngo parent domain
         localStorage.removeItem('user');
         window.location.replace('/login');
 
@@ -222,6 +222,44 @@ export const api = {
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || 'SSO login failed');
+        }
+
+        const data = await response.json();
+
+        if (!data.access_token) {
+            throw new Error('Invalid server response: No access token received');
+        }
+
+        return {
+            token: data.access_token,
+            user: {
+                id: data.user?.id || 0,
+                name: data.user?.name || '',
+                email: data.user?.email || '',
+                role_id: data.user?.role_id || 1,
+                firstname: data.user?.firstname || '',
+                lastname: data.user?.lastname || '',
+                titlename: data.user?.titlename || '',
+            }
+        };
+    },
+
+    // SSO Login with Laravel encrypted cookies
+    // Sends both tsm and liftngo_session cookies to backend
+    // Backend validates with Liftngo API server-side and returns local JWT
+    ssoCookieLogin: async (tsmCookie: string, liftngoSession: string): Promise<AuthResponse> => {
+        const response = await fetch(`${BASE_URL}/auth/sso/cookie`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tsm: tsmCookie,
+                liftngo_session: liftngoSession
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Cookie SSO login failed');
         }
 
         const data = await response.json();
