@@ -66,6 +66,50 @@ const Dashboard = () => {
     if (page() < totalPages()) setPage((p) => p + 1);
   };
 
+  const handlePageJump = (pageNum: number) => {
+    if (pageNum >= 1 && pageNum <= totalPages()) {
+      setPage(pageNum);
+    }
+  };
+
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    const current = page();
+    const total = totalPages();
+    const pages: (number | string)[] = [];
+
+    if (total <= 5) {
+      // Show all pages if total is 5 or less
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
+
+      if (current > 3) {
+        pages.push('...');
+      }
+
+      // Show pages around current page
+      const start = Math.max(2, current - 1);
+      const end = Math.min(total - 1, current + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (current < total - 2) {
+        pages.push('...');
+      }
+
+      // Always show last page
+      pages.push(total);
+    }
+
+    return pages;
+  };
+
   const getThemeIcon = () => {
     switch (theme()) {
       case "light":
@@ -150,7 +194,7 @@ const Dashboard = () => {
           <img
             src="/connectedSocial-icon-notextbg.png"
             alt="Logo"
-            class="w-8 h-8 md:hidden"
+            class="w-8 h-8"
           />
           <h1 class="text-xl font-bold text-text-primary hidden md:block">
             {t("technician_dashboard")}
@@ -171,7 +215,7 @@ const Dashboard = () => {
           <button
             id="tour-history-btn"
             onClick={() => navigate("/history")}
-            class="p-2 rounded-lg hover:bg-tertiary text-text-secondary transition-colors"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-tertiary text-text-secondary transition-colors"
             title={t("global_history")}
           >
             <svg
@@ -187,6 +231,7 @@ const Dashboard = () => {
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               ></path>
             </svg>
+            <span class="hidden md:inline text-sm font-medium">{t("open_close_history")}</span>
           </button>
           <button
             id="tour-theme-toggle"
@@ -313,7 +358,7 @@ const Dashboard = () => {
         {!vehiclesData.loading &&
           !vehiclesData.error &&
           vehiclesData()?.meta && (
-            <div class="flex justify-center items-center gap-4">
+            <div class="flex justify-center items-center gap-2 flex-wrap">
               <button
                 onClick={handlePrevPage}
                 disabled={page() === 1}
@@ -321,9 +366,27 @@ const Dashboard = () => {
               >
                 {t("previous")}
               </button>
-              <span class="text-text-secondary font-medium">
-                {t("page")} {page()} {t("of")} {totalPages()}
-              </span>
+
+              <For each={getPageNumbers()}>
+                {(pageNum) => (
+                  <>
+                    {typeof pageNum === 'string' ? (
+                      <span class="px-2 text-text-tertiary">...</span>
+                    ) : (
+                      <button
+                        onClick={() => handlePageJump(pageNum)}
+                        class={`min-w-[40px] h-10 rounded-lg transition-all duration-200 ${page() === pageNum
+                          ? 'bg-accent text-accent-text font-bold shadow-md scale-105'
+                          : 'bg-secondary border border-border-primary text-text-primary hover:bg-tertiary hover:scale-105'
+                          }`}
+                      >
+                        {pageNum}
+                      </button>
+                    )}
+                  </>
+                )}
+              </For>
+
               <button
                 onClick={handleNextPage}
                 disabled={page() === totalPages()}

@@ -15,7 +15,7 @@ const AuthGuard: Component<{ children: any }> = (props) => {
   createEffect(async () => {
     // Wait 3 seconds for cookies to be available from parent domain
     console.log("AuthGuard: Waiting for cookies...");
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 500));
     console.log("AuthGuard: Done waiting, checking cookies now...");
 
     // First, check if we have a valid local JWT token

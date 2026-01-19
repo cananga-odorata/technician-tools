@@ -13,6 +13,7 @@ export const dict = {
   technician_dashboard: "แดชบอร์ดช่างเทคนิค",
   search_placeholder: "ค้นหายานพาหนะ (ระบุ SN/รุ่น)...",
   global_history: "ประวัติรวม",
+  open_close_history: "ประวัติเปิด/ปิด",
   fleet_dashboard: "แดชบอร์ดฟลีท",
   failed_load: "ไม่สามารถโหลดข้อมูลยานพาหนะ",
   retry: "ลองใหม่",
@@ -128,6 +129,7 @@ export const dict = {
     "นำทางไปยังหน้าต่างๆ ของบันทึกประวัติโดยใช้ส่วนควบคุมเหล่านี้",
   // Pagination
   items_per_page: "จำนวนต่อหน้า",
+  jump_to: "ไปที่หน้า",
   // Confirmation Dialogs
   confirm_activate_title: "ยืนยันการเปิดใช้งาน?",
   confirm_activate_text: "คุณแน่ใจหรือไม่ว่าต้องการเปิดใช้งานยานพาหนะนี้?",

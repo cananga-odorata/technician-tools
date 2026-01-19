@@ -13,6 +13,13 @@ const Login = () => {
 
   // Check if already logged in via local JWT token on mount
   onMount(() => {
+    // In development mode (localhost), skip auto-redirect to allow Dev Mode cookie input
+    const isDevelopment = window.location.hostname === "localhost";
+    if (isDevelopment) {
+      console.log("Login page: Development mode detected, skipping auto-redirect for cookie input");
+      return;
+    }
+
     const existingToken = getCookie("tsm");
     console.log(
       "Login page: checking tsm cookie:",
