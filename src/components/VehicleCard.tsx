@@ -138,8 +138,8 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
       html: `${isOpen ? t("confirm_activate_text") : t("confirm_deactivate_text")}<br/><span class="text-orange-500 font-bold">(Serial Number: ${props.vehicle.serial_number})</span>`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: isOpen ? "#4CAF50" : "#f44336",
-      cancelButtonColor: "#f24f4fff",
+      confirmButtonColor: isOpen ? "#10b981" : "#f43f5e",
+      cancelButtonColor: "#6b7280",
       confirmButtonText: t("confirm_yes"),
       cancelButtonText: t("confirm_cancel"),
       customClass: {

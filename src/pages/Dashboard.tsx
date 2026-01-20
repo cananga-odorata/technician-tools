@@ -189,7 +189,7 @@ const Dashboard = () => {
     <div class="min-h-screen bg-primary transition-colors duration-300">
       <OnboardingTour steps={tourSteps} tourKey="dashboard_v1" />
       <nav class="bg-secondary border-b border-border-primary px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
-        <div class="flex items-center gap-3">
+        <div onclick={handleComback} class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-all">
           {/* <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-accent-text font-bold text-xl shadow-lg shadow-accent/20">T</div> */}
           <img
             src="/connectedSocial-icon-notextbg.png"
@@ -233,14 +233,14 @@ const Dashboard = () => {
             </svg>
             <span class="hidden md:inline text-sm font-medium">{t("open_close_history")}</span>
           </button>
-          <button
+          {/* <button
             id="tour-theme-toggle"
             onClick={toggleTheme}
             class="p-2 rounded-lg hover:bg-tertiary text-text-secondary transition-colors"
             title={t("theme_toggle")}
           >
             {getThemeIcon()}
-          </button>
+          </button> */}
           <button
             onClick={handleComback}
             class="bg-red-500/10 text-red-500 hover:bg-red-500/20 px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm font-medium transition-colors"
