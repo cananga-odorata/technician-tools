@@ -8,7 +8,7 @@ import {
 import { api } from "../services/api";
 import VehicleCard from "../components/VehicleCard";
 import { useNavigate } from "@solidjs/router";
-import { useTheme } from "../stores/theme";
+// import { useTheme } from "../stores/theme";
 import { mqttService } from "../services/mqttService";
 import OnboardingTour from "../components/OnboardingTour";
 import type { TourStep } from "../components/OnboardingTour";
@@ -18,7 +18,7 @@ import { LIFTNGO_URL } from "../services/api";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
+  // const { theme, toggleTheme } = useTheme();
   const [page, setPage] = createSignal(1);
   const [limit, setLimit] = createSignal(8);
   const [searchTerm, setSearchTerm] = createSignal("");
@@ -88,7 +88,7 @@ const Dashboard = () => {
       pages.push(1);
 
       if (current > 3) {
-        pages.push('...');
+        pages.push("...");
       }
 
       // Show pages around current page
@@ -100,7 +100,7 @@ const Dashboard = () => {
       }
 
       if (current < total - 2) {
-        pages.push('...');
+        pages.push("...");
       }
 
       // Always show last page
@@ -110,20 +110,20 @@ const Dashboard = () => {
     return pages;
   };
 
-  const getThemeIcon = () => {
-    switch (theme()) {
-      case "light":
-        return "☀️";
-      case "dark":
-        return "🌙";
-      case "gruvbox":
-        return "🌲";
-      case "orange":
-        return "🔥";
-      default:
-        return "☀️";
-    }
-  };
+  // const getThemeIcon = () => {
+  //   switch (theme()) {
+  //     case "light":
+  //       return "☀️";
+  //     case "dark":
+  //       return "🌙";
+  //     case "gruvbox":
+  //       return "🌲";
+  //     case "orange":
+  //       return "🔥";
+  //     default:
+  //       return "☀️";
+  //   }
+  // };
 
   // const handleLogout = async () => {
   //   await api.logout();
@@ -189,7 +189,10 @@ const Dashboard = () => {
     <div class="min-h-screen bg-primary transition-colors duration-300">
       <OnboardingTour steps={tourSteps} tourKey="dashboard_v1" />
       <nav class="bg-secondary border-b border-border-primary px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
-        <div onclick={handleComback} class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-all">
+        <div
+          onclick={handleComback}
+          class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-all"
+        >
           {/* <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-accent-text font-bold text-xl shadow-lg shadow-accent/20">T</div> */}
           <img
             src="/connectedSocial-icon-notextbg.png"
@@ -231,7 +234,9 @@ const Dashboard = () => {
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               ></path>
             </svg>
-            <span class="hidden md:inline text-sm font-medium">{t("open_close_history")}</span>
+            <span class="hidden md:inline text-sm font-medium">
+              {t("open_close_history")}
+            </span>
           </button>
           {/* <button
             id="tour-theme-toggle"
@@ -370,15 +375,16 @@ const Dashboard = () => {
               <For each={getPageNumbers()}>
                 {(pageNum) => (
                   <>
-                    {typeof pageNum === 'string' ? (
+                    {typeof pageNum === "string" ? (
                       <span class="px-2 text-text-tertiary">...</span>
                     ) : (
                       <button
                         onClick={() => handlePageJump(pageNum)}
-                        class={`min-w-[40px] h-10 rounded-lg transition-all duration-200 ${page() === pageNum
-                          ? 'bg-accent text-accent-text font-bold shadow-md scale-105'
-                          : 'bg-secondary border border-border-primary text-text-primary hover:bg-tertiary hover:scale-105'
-                          }`}
+                        class={`min-w-[40px] h-10 rounded-lg transition-all duration-200 ${
+                          page() === pageNum
+                            ? "bg-accent text-accent-text font-bold shadow-md scale-105"
+                            : "bg-secondary border border-border-primary text-text-primary hover:bg-tertiary hover:scale-105"
+                        }`}
                       >
                         {pageNum}
                       </button>
