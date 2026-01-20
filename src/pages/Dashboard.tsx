@@ -6,7 +6,7 @@ import {
   onCleanup,
 } from "solid-js";
 import { api } from "../services/api";
-import VehicleCard from "../components/VehicleCard";
+import VehicleCard from "../components/VehicleCardV2";
 import { useNavigate } from "@solidjs/router";
 // import { useTheme } from "../stores/theme";
 import { mqttService } from "../services/mqttService";
@@ -380,11 +380,10 @@ const Dashboard = () => {
                     ) : (
                       <button
                         onClick={() => handlePageJump(pageNum)}
-                        class={`min-w-[40px] h-10 rounded-lg transition-all duration-200 ${
-                          page() === pageNum
+                        class={`min-w-[40px] h-10 rounded-lg transition-all duration-200 ${page() === pageNum
                             ? "bg-accent text-accent-text font-bold shadow-md scale-105"
                             : "bg-secondary border border-border-primary text-text-primary hover:bg-tertiary hover:scale-105"
-                        }`}
+                          }`}
                       >
                         {pageNum}
                       </button>
