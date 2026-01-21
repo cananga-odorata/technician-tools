@@ -8,20 +8,20 @@ import {
 import { api } from "../services/api";
 import VehicleCard from "../components/VehicleCardV2";
 import { useNavigate } from "@solidjs/router";
-// import { useTheme } from "../stores/theme";
+import { useTheme } from "../stores/theme";
 import { mqttService } from "../services/mqttService";
-import OnboardingTour from "../components/OnboardingTour";
-import type { TourStep } from "../components/OnboardingTour";
+// import OnboardingTour from "../components/OnboardingTour";
+// import type { TourStep } from "../components/OnboardingTour";
 import { t } from "../i18n/config";
-import LanguageSelector from "../components/LanguageSelector";
+// import LanguageSelector from "../components/LanguageSelector";
 import { LIFTNGO_URL } from "../services/api";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  // const { theme, toggleTheme } = useTheme();
   const [page, setPage] = createSignal(1);
   const [limit, setLimit] = createSignal(8);
   const [searchTerm, setSearchTerm] = createSignal("");
+  useTheme();
 
   // Initialize shared MQTT connection
   createEffect(() => {
@@ -135,59 +135,59 @@ const Dashboard = () => {
     window.location.href = `${LIFTNGO_URL}/dashboard`;
   };
 
-  const tourSteps: TourStep[] = [
-    {
-      title: t("tour_dashboard_title"),
-      content: t("tour_dashboard_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-search-bar",
-      title: t("tour_search_title"),
-      content: t("tour_search_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-history-btn",
-      title: t("tour_history_btn_title"),
-      content: t("tour_history_btn_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-theme-toggle",
-      title: t("tour_theme_title"),
-      content: t("tour_theme_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-vehicle-card",
-      title: t("tour_card_title"),
-      content: t("tour_card_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-vehicle-card .tour-status-badge",
-      title: t("tour_status_title"),
-      content: t("tour_status_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-vehicle-card .tour-controls",
-      title: t("tour_controls_title"),
-      content: t("tour_controls_content"),
-      position: "top",
-    },
-    {
-      target: "#tour-vehicle-card .tour-history-link",
-      title: t("tour_history_link_title"),
-      content: t("tour_history_link_content"),
-      position: "top",
-    },
-  ];
+  // const tourSteps: TourStep[] = [
+  //   {
+  //     title: t("tour_dashboard_title"),
+  //     content: t("tour_dashboard_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-search-bar",
+  //     title: t("tour_search_title"),
+  //     content: t("tour_search_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-history-btn",
+  //     title: t("tour_history_btn_title"),
+  //     content: t("tour_history_btn_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-theme-toggle",
+  //     title: t("tour_theme_title"),
+  //     content: t("tour_theme_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-vehicle-card",
+  //     title: t("tour_card_title"),
+  //     content: t("tour_card_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-vehicle-card .tour-status-badge",
+  //     title: t("tour_status_title"),
+  //     content: t("tour_status_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-vehicle-card .tour-controls",
+  //     title: t("tour_controls_title"),
+  //     content: t("tour_controls_content"),
+  //     position: "top",
+  //   },
+  //   {
+  //     target: "#tour-vehicle-card .tour-history-link",
+  //     title: t("tour_history_link_title"),
+  //     content: t("tour_history_link_content"),
+  //     position: "top",
+  //   },
+  // ];
 
   return (
     <div class="min-h-screen bg-primary transition-colors duration-300">
-      <OnboardingTour steps={tourSteps} tourKey="dashboard_v1" />
+      {/* <OnboardingTour steps={tourSteps} tourKey="dashboard_v1" /> */}
       <nav class="bg-secondary border-b border-border-primary px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
         <div
           onclick={handleComback}
@@ -204,7 +204,7 @@ const Dashboard = () => {
           </h1>
         </div>
         <div class="flex items-center gap-4">
-          <LanguageSelector />
+          {/* <LanguageSelector /> */}
           <div id="tour-search-bar" class="relative hidden md:block">
             <input
               type="text"
@@ -381,8 +381,8 @@ const Dashboard = () => {
                       <button
                         onClick={() => handlePageJump(pageNum)}
                         class={`min-w-[40px] h-10 rounded-lg transition-all duration-200 ${page() === pageNum
-                            ? "bg-accent text-accent-text font-bold shadow-md scale-105"
-                            : "bg-secondary border border-border-primary text-text-primary hover:bg-tertiary hover:scale-105"
+                          ? "bg-accent text-accent-text font-bold shadow-md scale-105"
+                          : "bg-secondary border border-border-primary text-text-primary hover:bg-tertiary hover:scale-105"
                           }`}
                       >
                         {pageNum}
