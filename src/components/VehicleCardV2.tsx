@@ -165,7 +165,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
             </div>
 
             {/* Card Body */}
-            <div class="p-4 flex-1">
+            <div class="p-4 flex-1 flex flex-col">
                 <div class="space-y-2">
 
                     {/* Usage Time */}
@@ -252,7 +252,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
                 </div> */}
 
                 {/* Legacy Actions */}
-                <div class="space-y-3 mt-4 pt-3 border-t border-gray-100">
+                <div class="space-y-3 mt-auto pt-3 border-t border-gray-100">
                     <div class="grid grid-cols-2 gap-3">
                         <button
                             onClick={() => sendCommandLegacy(true)}
