@@ -7,7 +7,7 @@ import {
 } from "solid-js";
 import { api } from "../services/api";
 import VehicleCard from "../components/VehicleCardV2";
-import { useNavigate } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { useTheme } from "../stores/theme";
 import { mqttService } from "../services/mqttService";
 // import OnboardingTour from "../components/OnboardingTour";
@@ -18,6 +18,7 @@ import { LIFTNGO_URL } from "../services/api";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const params = useParams();
   const [page, setPage] = createSignal(1);
   const [limit, setLimit] = createSignal(8);
   const [searchTerm, setSearchTerm] = createSignal("");
@@ -132,7 +133,11 @@ const Dashboard = () => {
   const handleComback = async () => {
     // await api.logout();
     // navigate('/login', { replace: true });
-    window.location.href = `${LIFTNGO_URL}/dashboard`;
+
+    // Check if we have a service parameter in the URL (e.g. /delivery-order)
+    // If so, redirect back to that service on LiftNGo
+    const targetPath = params.service ? `/${params.service}` : '/dashboard';
+    window.location.href = `${LIFTNGO_URL}${targetPath}`;
   };
 
   // const tourSteps: TourStep[] = [

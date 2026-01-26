@@ -229,6 +229,14 @@ const App: Component = () => {
           </AuthGuard>
         )}
       />
+      <Route
+        path="/:service"
+        component={() => (
+          <AuthGuard>
+            <Dashboard />
+          </AuthGuard>
+        )}
+      />
     </Router>
   );
 };
