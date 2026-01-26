@@ -238,7 +238,7 @@ const App: Component = () => {
         )}
       />
       <Route
-        path="/:service"
+        path="*paramName"
         component={() => (
           <AuthGuard>
             <Dashboard />

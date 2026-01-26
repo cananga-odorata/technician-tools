@@ -1,5 +1,13 @@
-import { createResource, For, Show, createSignal } from "solid-js";
-import { useNavigate, useSearchParams, useParams } from "@solidjs/router";
+import {
+  createResource,
+  For,
+  Show,
+  createSignal
+} from "solid-js";
+import {
+  useNavigate,
+  useSearchParams
+} from "@solidjs/router";
 import { api } from "../services/api";
 import { t } from "../i18n/config";
 // import LanguageSelector from "../components/LanguageSelector";
@@ -10,7 +18,6 @@ import { LIFTNGO_URL } from "../services/api";
 
 const VehicleHistory = () => {
   const navigate = useNavigate();
-  const params = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = createSignal(1);
   useTheme();
@@ -32,7 +39,8 @@ const VehicleHistory = () => {
 
   const handleComeback = () => {
     //redirect to dashboard domain : liftngo
-    const targetPath = params.service ? `/${params.service}` : '/dashboard';
+    const storedPath = localStorage.getItem("liftngo_return_path");
+    const targetPath = storedPath || "/dashboard";
     window.location.href = `${LIFTNGO_URL}${targetPath}`;
   };
 
@@ -201,8 +209,7 @@ const VehicleHistory = () => {
           <div class="flex items-center gap-4">
             <button
               onClick={() => {
-                const targetPath = params.service ? `/${params.service}` : '/';
-                navigate(targetPath);
+                navigate("/");
               }}
               class="p-2 rounded-full hover:bg-tertiary text-text-secondary transition-colors"
             >

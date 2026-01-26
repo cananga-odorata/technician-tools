@@ -26,6 +26,14 @@ const Dashboard = () => {
 
   // Initialize shared MQTT connection
   createEffect(() => {
+    // Save current path to LocalStorage for "Comeback" button functionality
+    // This allows us to return to the exact LiftNGo path (e.g. /status_vehicle/listContract)
+    const path = window.location.pathname;
+    // Ignore internal paths
+    if (path !== '/' && !path.startsWith('/login') && !path.startsWith('/history') && !path.startsWith('/vehicle')) {
+      localStorage.setItem("liftngo_return_path", path);
+    }
+
     mqttService.connect();
     onCleanup(() => {
       // Optional: Disconnect on unmount if we want to close the connection when leaving the dashboard
@@ -47,6 +55,21 @@ const Dashboard = () => {
   });
 
   // Fetch data when page or searchTerm changes
+  createEffect(() => {
+    const path = window.location.pathname;
+    // Ignore internal paths
+    if (path !== '/' && !path.startsWith('/login') && !path.startsWith('/history') && !path.startsWith('/vehicle')) {
+      localStorage.setItem("liftngo_return_path", path);
+    } else if (path === '/') {
+      // If logic dictates we clear it or keep it? 
+      // User request: "keep the param obtained". 
+      // Usually if they go to / it means they might have lost context or just want dashboard.
+      // Let's NOT clear it automatically unless we want to be strict.
+      // BUT if they enter directly at /, we probably should default to /dashboard unless there is a stale value.
+      // For now, let's just save valid "service" paths.
+    }
+  });
+
   const [vehiclesData] = createResource(
     () => ({ page: page(), limit: limit(), search: searchTerm() }),
     async ({ page, limit, search }) => api.getVehicles(page, limit, search),
@@ -223,8 +246,7 @@ const Dashboard = () => {
           <button
             id="tour-history-btn"
             onClick={() => {
-              const targetPath = params.service ? `/${params.service}/history` : '/history';
-              navigate(targetPath);
+              navigate("/history");
             }}
             class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-tertiary text-text-secondary transition-colors"
             title={t("global_history")}
