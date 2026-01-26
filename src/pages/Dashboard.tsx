@@ -222,7 +222,10 @@ const Dashboard = () => {
           </div>
           <button
             id="tour-history-btn"
-            onClick={() => navigate("/history")}
+            onClick={() => {
+              const targetPath = params.service ? `/${params.service}/history` : '/history';
+              navigate(targetPath);
+            }}
             class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-tertiary text-text-secondary transition-colors"
             title={t("global_history")}
           >

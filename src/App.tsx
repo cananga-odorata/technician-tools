@@ -230,6 +230,14 @@ const App: Component = () => {
         )}
       />
       <Route
+        path="/:service/history"
+        component={() => (
+          <AuthGuard>
+            <VehicleHistory />
+          </AuthGuard>
+        )}
+      />
+      <Route
         path="/:service"
         component={() => (
           <AuthGuard>
