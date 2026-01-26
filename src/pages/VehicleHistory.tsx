@@ -1,5 +1,13 @@
-import { createResource, For, Show, createSignal } from "solid-js";
-import { useNavigate, useSearchParams } from "@solidjs/router";
+import {
+  createResource,
+  For,
+  Show,
+  createSignal
+} from "solid-js";
+import {
+  useNavigate,
+  useSearchParams
+} from "@solidjs/router";
 import { api } from "../services/api";
 import { t } from "../i18n/config";
 // import LanguageSelector from "../components/LanguageSelector";
@@ -31,7 +39,9 @@ const VehicleHistory = () => {
 
   const handleComeback = () => {
     //redirect to dashboard domain : liftngo
-    window.location.href = `${LIFTNGO_URL}/dashboard`;
+    const storedPath = localStorage.getItem("liftngo_return_path");
+    const targetPath = storedPath || "/dashboard";
+    window.location.href = `${LIFTNGO_URL}${targetPath}`;
   };
 
   // Default date range: if searching by serial, use 30 days; otherwise 24 hours
@@ -198,7 +208,9 @@ const VehicleHistory = () => {
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div class="flex items-center gap-4">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => {
+                navigate("/");
+              }}
               class="p-2 rounded-full hover:bg-tertiary text-text-secondary transition-colors"
             >
               <svg

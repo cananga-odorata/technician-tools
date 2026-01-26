@@ -229,6 +229,22 @@ const App: Component = () => {
           </AuthGuard>
         )}
       />
+      <Route
+        path="/:service/history"
+        component={() => (
+          <AuthGuard>
+            <VehicleHistory />
+          </AuthGuard>
+        )}
+      />
+      <Route
+        path="*paramName"
+        component={() => (
+          <AuthGuard>
+            <Dashboard />
+          </AuthGuard>
+        )}
+      />
     </Router>
   );
 };

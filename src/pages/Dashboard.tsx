@@ -7,7 +7,7 @@ import {
 } from "solid-js";
 import { api } from "../services/api";
 import VehicleCard from "../components/VehicleCardV2";
-import { useNavigate } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { useTheme } from "../stores/theme";
 import { mqttService } from "../services/mqttService";
 // import OnboardingTour from "../components/OnboardingTour";
@@ -18,6 +18,7 @@ import { LIFTNGO_URL } from "../services/api";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const params = useParams();
   const [page, setPage] = createSignal(1);
   const [limit, setLimit] = createSignal(8);
   const [searchTerm, setSearchTerm] = createSignal("");
@@ -25,6 +26,14 @@ const Dashboard = () => {
 
   // Initialize shared MQTT connection
   createEffect(() => {
+    // Save current path to LocalStorage for "Comeback" button functionality
+    // This allows us to return to the exact LiftNGo path (e.g. /status_vehicle/listContract)
+    const path = window.location.pathname;
+    // Ignore internal paths
+    if (path !== '/' && !path.startsWith('/login') && !path.startsWith('/history') && !path.startsWith('/vehicle')) {
+      localStorage.setItem("liftngo_return_path", path);
+    }
+
     mqttService.connect();
     onCleanup(() => {
       // Optional: Disconnect on unmount if we want to close the connection when leaving the dashboard
@@ -46,6 +55,21 @@ const Dashboard = () => {
   });
 
   // Fetch data when page or searchTerm changes
+  createEffect(() => {
+    const path = window.location.pathname;
+    // Ignore internal paths
+    if (path !== '/' && !path.startsWith('/login') && !path.startsWith('/history') && !path.startsWith('/vehicle')) {
+      localStorage.setItem("liftngo_return_path", path);
+    } else if (path === '/') {
+      // If logic dictates we clear it or keep it? 
+      // User request: "keep the param obtained". 
+      // Usually if they go to / it means they might have lost context or just want dashboard.
+      // Let's NOT clear it automatically unless we want to be strict.
+      // BUT if they enter directly at /, we probably should default to /dashboard unless there is a stale value.
+      // For now, let's just save valid "service" paths.
+    }
+  });
+
   const [vehiclesData] = createResource(
     () => ({ page: page(), limit: limit(), search: searchTerm() }),
     async ({ page, limit, search }) => api.getVehicles(page, limit, search),
@@ -132,7 +156,11 @@ const Dashboard = () => {
   const handleComback = async () => {
     // await api.logout();
     // navigate('/login', { replace: true });
-    window.location.href = `${LIFTNGO_URL}/dashboard`;
+
+    // Check if we have a service parameter in the URL (e.g. /delivery-order)
+    // If so, redirect back to that service on LiftNGo
+    const targetPath = params.service ? `/${params.service}` : '/dashboard';
+    window.location.href = `${LIFTNGO_URL}${targetPath}`;
   };
 
   // const tourSteps: TourStep[] = [
@@ -217,7 +245,9 @@ const Dashboard = () => {
           </div>
           <button
             id="tour-history-btn"
-            onClick={() => navigate("/history")}
+            onClick={() => {
+              navigate("/history");
+            }}
             class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-tertiary text-text-secondary transition-colors"
             title={t("global_history")}
           >
