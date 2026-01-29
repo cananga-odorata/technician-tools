@@ -153,13 +153,13 @@ const Dashboard = () => {
   //   await api.logout();
   //   navigate("/login", { replace: true });
   // };
-  const handleComback = async () => {
-    // await api.logout();
-    // navigate('/login', { replace: true });
+  const handleComeback = () => {
+    // Check if we have a stored return path
+    const storedPath = localStorage.getItem("liftngo_return_path");
 
-    // Check if we have a service parameter in the URL (e.g. /delivery-order)
-    // If so, redirect back to that service on LiftNGo
-    const targetPath = params.service ? `/${params.service}` : '/dashboard';
+    // Use stored path if available, otherwise check service param or default to dashboard
+    const targetPath = storedPath || (params.service ? `/${params.service}` : '/dashboard');
+
     window.location.href = `${LIFTNGO_URL}${targetPath}`;
   };
 
@@ -218,7 +218,7 @@ const Dashboard = () => {
       {/* <OnboardingTour steps={tourSteps} tourKey="dashboard_v1" /> */}
       <nav class="bg-secondary border-b border-border-primary px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
         <div
-          onclick={handleComback}
+          onclick={handleComeback}
           class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-all"
         >
           {/* <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-accent-text font-bold text-xl shadow-lg shadow-accent/20">T</div> */}
@@ -277,7 +277,7 @@ const Dashboard = () => {
             {getThemeIcon()}
           </button> */}
           <button
-            onClick={handleComback}
+            onClick={handleComeback}
             class="bg-red-500/10 text-red-500 hover:bg-red-500/20 px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm font-medium transition-colors"
             title={t("comeback")}
           >
