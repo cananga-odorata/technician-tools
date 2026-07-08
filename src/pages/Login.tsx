@@ -13,10 +13,15 @@ const Login = () => {
 
   // Check if already logged in via local JWT token on mount
   onMount(() => {
+    const authError = sessionStorage.getItem("tool_technician_auth_error");
+
     // In development mode (localhost), skip auto-redirect to allow Dev Mode cookie input
     const isDevelopment = window.location.hostname === "localhost";
     if (isDevelopment) {
       console.log("Login page: Development mode detected, skipping auto-redirect for cookie input");
+      if (authError) {
+        setError(authError);
+      }
       return;
     }
 
@@ -48,9 +53,13 @@ const Login = () => {
     const isLiftngoToken = existingToken && /^\d+\|/.test(existingToken);
 
     if (isLocalJwt) {
+      sessionStorage.removeItem("tool_technician_auth_error");
       // Already have local JWT - authenticated, redirect to dashboard
       console.log("Login page: Local JWT found, redirecting to dashboard");
       window.location.replace("/");
+    } else if (authError) {
+      console.warn("Login page: auth error found, staying on login page");
+      setError(authError);
     } else if (isLiftngoToken) {
       // This is a Liftngo token - redirect to dashboard for SSO exchange
       console.log(
@@ -74,9 +83,14 @@ const Login = () => {
       // Store auth data in cookies instead of localStorage
       setCookie("tsm", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
+      sessionStorage.removeItem("tool_technician_auth_error");
       navigate("/");
     } catch (err) {
-      setError(t("invalid_credentials"));
+      setError(
+        err instanceof Error
+          ? err.message
+          : "เข้าสู่ระบบไม่สำเร็จ โปรดติดต่อผู้พัฒนาระบบ",
+      );
     } finally {
       setLoading(false);
     }
@@ -129,7 +143,20 @@ const Login = () => {
 
           {error() && (
             <div class="p-3 bg-red-500/10 text-red-500 text-sm rounded-lg text-center border border-red-500/20">
-              {error()}
+              <div>{error()}</div>
+              <div class="mt-1 text-xs text-red-400">
+                หากยังเข้าใช้งานไม่ได้ โปรดติดต่อผู้พัฒนาระบบ
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  sessionStorage.removeItem("tool_technician_auth_error");
+                  window.location.replace("/");
+                }}
+                class="mt-3 px-3 py-1.5 rounded-md bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-medium transition-colors"
+              >
+                ลองตรวจสอบสิทธิ์อีกครั้ง
+              </button>
             </div>
           )}
 
@@ -183,6 +210,7 @@ const Login = () => {
                     try { tsm = decodeURIComponent(tsm); } catch { /* leave as-is */ }
 
                     if (tsm) {
+                      sessionStorage.removeItem("tool_technician_auth_error");
                       setCookie("tsm", tsm);
                       console.log("Dev: tsm token set ->", tsm.substring(0, 12) + "...");
                       window.location.replace("/");

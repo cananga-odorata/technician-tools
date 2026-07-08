@@ -12,6 +12,14 @@ const AuthGuard: Component<{ children: any }> = (props) => {
   );
   const [isLoading, setIsLoading] = createSignal(true);
 
+  const setAuthError = (message: string) => {
+    sessionStorage.setItem(
+      "tool_technician_auth_error",
+      message ||
+        "เกิดข้อผิดพลาดในการเข้าสู่ระบบ โปรดติดต่อผู้พัฒนาระบบ",
+    );
+  };
+
   createEffect(async () => {
     // Wait 3 seconds for cookies to be available from parent domain
     console.log("AuthGuard: Waiting for cookies...");
@@ -95,6 +103,10 @@ const AuthGuard: Component<{ children: any }> = (props) => {
         }
       } catch (error: any) {
         console.warn("AuthGuard: SSO login failed:", error?.message || error);
+        setAuthError(
+          error?.message ||
+            "บัญชีนี้ไม่สามารถเข้าใช้งาน tool-technician ได้ โปรดติดต่อผู้พัฒนาระบบ",
+        );
         // Don't remove cookies from parent domain - they belong to Liftngo
         setIsAuthenticated(false);
       }
@@ -119,10 +131,17 @@ const AuthGuard: Component<{ children: any }> = (props) => {
       }
     } catch (error: any) {
       console.warn("AuthGuard: Cookie-based auth failed:", error?.message || error);
+      setAuthError(
+        error?.message ||
+          "ไม่สามารถตรวจสอบสิทธิ์จาก cookie ได้ โปรดติดต่อผู้พัฒนาระบบ",
+      );
     }
 
     // All authentication methods failed
     console.log("AuthGuard: All authentication methods failed, redirecting to login");
+    setAuthError(
+      "ไม่สามารถเข้าสู่ระบบ tool-technician ได้ โปรดติดต่อผู้พัฒนาระบบ",
+    );
     setIsAuthenticated(false);
     setIsLoading(false);
   });

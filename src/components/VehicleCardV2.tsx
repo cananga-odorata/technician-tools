@@ -17,6 +17,8 @@ interface VehicleCardV2Props {
 }
 
 const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
+  const technicianFullAccessRoleIds = [18, 26];
+
   const [status, setStatus] = createSignal<"connected" | "disconnected">(
     "disconnected",
   );
@@ -42,6 +44,8 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
     const user = userJson ? JSON.parse(userJson) : null;
     return user?.role_id || 0;
   };
+  const canUseTechnicianQc = () =>
+    technicianFullAccessRoleIds.includes(Number(getUserRoleId()));
 
   onMount(() => {
     setTimeout(() => setShowCursor(true), 500);
@@ -329,7 +333,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           </p>
 
           {/* Match Process Status */}
-          {getUserRoleId() === 18 &&
+          {canUseTechnicianQc() &&
             (() => {
               const getMatchProcessLabel = (process: number) => {
                 switch (process) {
@@ -419,8 +423,8 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
               );
             })()}
 
-          {/* Button approve product - Only show for role_id 18, only enabled when match_process === 2 */}
-          {getUserRoleId() === 18 && (
+          {/* Button approve product - Only show for technician full-access roles, only enabled when match_process === 2 */}
+          {canUseTechnicianQc() && (
             <div class="mt-2 pt-2 border-t border-dashed border-gray-200 relative">
               {currentMatchProcess() === 4 ? (
                 // Completed state - show success badge
