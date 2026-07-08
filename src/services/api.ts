@@ -93,6 +93,10 @@ const handleResponse = async (response: Response) => {
     // Session expired - redirect to login without removing parent domain cookies
     console.warn("Session expired, redirecting to login...");
     // Note: Don't removeCookie here - cookies belong to Liftngo parent domain
+    sessionStorage.setItem(
+      "tool_technician_auth_error",
+      "Session หมดอายุหรือไม่มีสิทธิ์เข้าใช้งาน tool-technician โปรดติดต่อผู้พัฒนาระบบ",
+    );
     localStorage.removeItem("user");
     window.location.replace("/login");
 
